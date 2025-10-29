@@ -1,0 +1,163 @@
+{
+  "common": {
+    "start": "Start",
+    "cancel": "Cancel",
+    "close": "Close",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "save": "Save",
+    "preparing": "Preparing"
+  },
+  "photoManager": {
+    "title": "Photo Management",
+    "practiceStart": {
+      "title": "Start Practice",
+      "description": "Select photo order and start practicing",
+      "folder": "Folder:",
+      "allPhotos": "All Photos",
+      "oldest": "Oldest",
+      "newest": "Newest",
+      "random": "Random",
+      "startButton": "Start"
+    },
+    "folders": {
+      "title": "Folders",
+      "allPhotos": "All Photos",
+      "createFolder": "New Folder",
+      "folderName": "Folder Name",
+      "deleteFolder": "Delete Folder",
+      "deleteConfirm": "Delete this folder?\nPhotos in this folder will be moved to 'All Photos'.",
+      "createPrompt": "Enter new folder name",
+      "createError": "Please enter a folder name"
+    },
+    "management": {
+      "addPhoto": "Add Photo",
+      "backup": "Backup",
+      "restore": "Restore",
+      "hint": "Click on a photo to use it in the drawing tool. You can upload multiple photos at once."
+    },
+    "savedPhotos": "Saved Photos",
+    "backupStatus": {
+      "exporting": "Exporting...",
+      "exportComplete": "Backup complete!",
+      "exportError": "Error: Backup failed",
+      "importing": "Importing...",
+      "importComplete": "Import complete! Added: {{imported}}, Skipped: {{skipped}}, Errors: {{errors}}",
+      "importError": "Error: Import failed"
+    }
+  },
+  "photoGrid": {
+    "loading": "Loading photos...",
+    "noPhotos": "No photos",
+    "noPhotosDescription": "Upload photos using the \"Add Photo\" button",
+    "loadError": "Load Error",
+    "loadErrorDescription": "Unable to display this image",
+    "deleteConfirm": "Delete this photo?",
+    "deleteSuccess": "Photo deleted",
+    "selectMode": "Select",
+    "cancelSelection": "Cancel",
+    "selectedCount": "{{count}} selected",
+    "bulkDelete": "Delete",
+    "bulkMove": "Move to Folder",
+    "bulkDeleteConfirm": "Delete {{count}} selected photo(s)?",
+    "viewImage": "View Image",
+    "moveToFolder": "Move to Folder",
+    "selectFolder": "Select destination folder",
+    "move": "Move",
+    "moveSuccess": "Photo(s) moved"
+  },
+  "photoUploader": {
+    "title": "Upload Photos",
+    "selectFolder": "Save to folder:",
+    "dragDrop": "Drag & drop files here",
+    "or": "or",
+    "selectFiles": "Select Files",
+    "supportedFormats": "Supported: JPEG, PNG (max 10 files)",
+    "uploading": "Uploading...",
+    "uploadProgress": "Uploading {{current}}/{{total}} files...",
+    "uploadComplete": "Upload complete!",
+    "uploadCompleteMessage": "Added {{count}} photo(s)",
+    "warning": "Warning",
+    "heicWarning": "HEIC format not supported: {{files}}",
+    "heicHint": "iPhone photos are often in HEIC format. Change your iPhone settings to Camera → Formats → Most Compatible to save as JPEG instead.",
+    "tooManyFiles": "Maximum 10 files can be uploaded at once",
+    "invalidFileType": "Unsupported file type: {{files}}"
+  },
+  "drawingTool": {
+    "title": "Face Gesture Drawing Learning Tool",
+    "backToPhotos": "Back to Photo List",
+    "currentStep": "Step {{step}}: {{description}}",
+    "steps": {
+      "1": "Trace over the photo (Tracing Mode)",
+      "2": "Draw independently next to the photo"
+    },
+    "changePhoto": "Change Photo",
+    "referencePhoto": "Reference Photo",
+    "drawingSpace": "Drawing Space",
+    "loadingPhoto": "Loading photo...",
+    "hints": {
+      "title": "Drawing Tips:",
+      "step1": "Step 1: Draw directly on top of the photo to trace",
+      "step2": "Step 2: Draw independently using the photo as reference (answer check available)"
+    },
+    "controls": {
+      "opacity": "Reference Photo Opacity:",
+      "opacityHint": "You're drawing on top of the reference photo. Adjust opacity to find a comfortable tracing level.",
+      "answerCheck": "Show Answer",
+      "transparency": "Opacity:"
+    },
+    "toolbar": {
+      "undo": "Undo",
+      "redo": "Redo",
+      "pen": "Pen",
+      "line": "Line",
+      "ellipse": "Ellipse",
+      "eraser": "Eraser",
+      "clearAll": "Clear All",
+      "grid": "Grid",
+      "gridSize": "Grid Size:",
+      "gridOpacity": "Grid Opacity:",
+      "color": "Color:",
+      "size": "Size:",
+      "download": "Download Image"
+    }
+  },
+  "language": {
+    "select": "Select Language",
+    "ja": "日本語",
+    "en": "English"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions (FAQ)",
+    "backToApp": "Back to App",
+    "questions": {
+      "q1": {
+        "question": "I cannot add photos",
+        "answer": "Supported image formats are JPEG, PNG, and WEBP.\n\nIf your iPhone photos are in HEIC format, they cannot be uploaded. Change your iPhone settings: Settings → Camera → Formats → Most Compatible to save as JPEG.\n\nThere is no file size limit, but very large images (over 10MB) may take time to process."
+      },
+      "q2": {
+        "question": "Where are photos stored?",
+        "answer": "Photos are stored in your browser's IndexedDB (local storage).\n\nThey are never sent to a server - everything stays on your device. Your privacy is completely protected.\n\nNote: If you clear your browser data, stored photos will be deleted. We recommend backing up regularly."
+      },
+      "q3": {
+        "question": "What is the backup feature?",
+        "answer": "The backup feature downloads your saved photos as a JSON file.\n\n【How to Backup】\n1. Click the \"Backup\" button on the photo management screen\n2. A JSON file will be downloaded\n3. Save this file in a safe location\n\n【How to Restore】\n1. Click the \"Restore\" button on the photo management screen\n2. Select your saved JSON file\n3. Photos will be restored (duplicates are skipped)\n\nWith backups, you can use the same photos on different devices or browsers."
+      },
+      "q4": {
+        "question": "My photos disappeared",
+        "answer": "Reasons photos may disappear:\n\n• Browser cache/data was cleared\n• Using private/incognito mode\n• Opened on a different browser or device\n\n【Solution】\nIf you have a backup file, you can restore your photos using the \"Restore\" feature.\n\nWithout a backup, unfortunately photos cannot be recovered. We recommend backing up regularly in the future."
+      },
+      "q5": {
+        "question": "What are folders?",
+        "answer": "The folder feature lets you organize photos by category.\n\n【Creating Folders】\n1. Click \"New Folder\" button on photo management screen\n2. Enter a folder name (e.g., Portraits, Landscapes, Animals)\n\n【Organizing Photos】\n• When uploading: Select a folder before adding photos\n• Existing photos: Use the 3-dot menu (⋮) → \"Move to Folder\"\n\n【Practice by Folder】\nSelect a folder on the practice start screen to practice with only photos in that folder.\n\n【Deleting Folders】\nDeleting a folder doesn't delete photos - they move to \"All Photos\"."
+      },
+      "q6": {
+        "question": "Can I use this on iPad/tablet?",
+        "answer": "Yes, you can use this on iPad/tablet.\n\n【How to Use】\n1. Open Safari or Chrome on your iPad\n2. Access this app's URL\n3. Draw with your finger or Apple Pencil\n\n【Touch Controls】\n• Tap the canvas directly to draw\n• Pinch to zoom (browser feature)\n• Scroll prevention keeps the page from moving while drawing\n\n【Local Network Use】\nRun the development server on PC to access from iPad on the same Wi-Fi network."
+      }
+    }
+  }
+}

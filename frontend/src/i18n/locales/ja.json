@@ -1,0 +1,163 @@
+{
+  "common": {
+    "start": "開始",
+    "cancel": "キャンセル",
+    "close": "閉じる",
+    "loading": "読み込み中...",
+    "error": "エラー",
+    "success": "成功",
+    "confirm": "確認",
+    "delete": "削除",
+    "save": "保存",
+    "preparing": "準備中"
+  },
+  "photoManager": {
+    "title": "写真管理",
+    "practiceStart": {
+      "title": "練習を開始",
+      "description": "写真の選択方法を選んで、練習を始めましょう",
+      "folder": "フォルダ:",
+      "allPhotos": "全て",
+      "oldest": "古い順",
+      "newest": "新しい順",
+      "random": "ランダム",
+      "startButton": "開始"
+    },
+    "folders": {
+      "title": "フォルダ",
+      "allPhotos": "全て",
+      "createFolder": "新規フォルダ",
+      "folderName": "フォルダ名",
+      "deleteFolder": "フォルダを削除",
+      "deleteConfirm": "このフォルダを削除しますか？\nフォルダ内の写真は「全て」に移動されます。",
+      "createPrompt": "新しいフォルダ名を入力してください",
+      "createError": "フォルダ名を入力してください"
+    },
+    "management": {
+      "addPhoto": "写真を追加",
+      "backup": "バックアップ",
+      "restore": "復元",
+      "hint": "写真をクリックして描画ツールで使用できます。複数の写真をまとめてアップロード可能です。"
+    },
+    "savedPhotos": "保存された写真",
+    "backupStatus": {
+      "exporting": "エクスポート中...",
+      "exportComplete": "バックアップ完了！",
+      "exportError": "エラー: バックアップに失敗しました",
+      "importing": "インポート中...",
+      "importComplete": "インポート完了！追加: {{imported}}件, スキップ: {{skipped}}件, エラー: {{errors}}件",
+      "importError": "エラー: インポートに失敗しました"
+    }
+  },
+  "photoGrid": {
+    "loading": "写真を読み込み中...",
+    "noPhotos": "写真がありません",
+    "noPhotosDescription": "「写真を追加」ボタンから写真をアップロードしてください",
+    "loadError": "読み込みエラー",
+    "loadErrorDescription": "この画像を表示できません",
+    "deleteConfirm": "この写真を削除しますか？",
+    "deleteSuccess": "写真を削除しました",
+    "selectMode": "選択",
+    "cancelSelection": "キャンセル",
+    "selectedCount": "{{count}}枚選択中",
+    "bulkDelete": "削除",
+    "bulkMove": "フォルダに移動",
+    "bulkDeleteConfirm": "選択した{{count}}枚の写真を削除しますか？",
+    "viewImage": "拡大表示",
+    "moveToFolder": "フォルダに移動",
+    "selectFolder": "移動先フォルダを選択",
+    "move": "移動",
+    "moveSuccess": "写真を移動しました"
+  },
+  "photoUploader": {
+    "title": "写真をアップロード",
+    "selectFolder": "保存先フォルダ:",
+    "dragDrop": "ここにファイルをドラッグ&ドロップ",
+    "or": "または",
+    "selectFiles": "ファイルを選択",
+    "supportedFormats": "対応形式: JPEG, PNG (最大10ファイル)",
+    "uploading": "アップロード中...",
+    "uploadProgress": "{{current}}/{{total}} 枚をアップロード中...",
+    "uploadComplete": "アップロード完了！",
+    "uploadCompleteMessage": "{{count}}枚の写真を追加しました",
+    "warning": "警告",
+    "heicWarning": "HEIC形式の画像は対応していません: {{files}}",
+    "heicHint": "iPhoneで撮影した写真はHEIC形式の場合があります。設定アプリから「カメラ」→「フォーマット」→「互換性優先」に変更すると、JPEG形式で保存されます。",
+    "tooManyFiles": "一度にアップロードできるのは最大10ファイルです",
+    "invalidFileType": "対応していないファイル形式です: {{files}}"
+  },
+  "drawingTool": {
+    "title": "顔ジェスチャードローイング学習ツール",
+    "backToPhotos": "写真一覧に戻る",
+    "currentStep": "Step {{step}}: {{description}}",
+    "steps": {
+      "1": "顔写真の上に描画（トレースモード）",
+      "2": "写真の隣に自力で描く"
+    },
+    "changePhoto": "写真切替",
+    "referencePhoto": "参考写真",
+    "drawingSpace": "描画スペース",
+    "loadingPhoto": "写真を読み込み中...",
+    "hints": {
+      "title": "描画のヒント:",
+      "step1": "Step 1: 写真の上に直接描いてトレース",
+      "step2": "Step 2: 写真を参考に自力で描く（答え合わせ可能）"
+    },
+    "controls": {
+      "opacity": "参考写真の透明度:",
+      "opacityHint": "参考写真の上に描画しています。透明度を調整してトレースしやすい濃さに設定してください。",
+      "answerCheck": "答え合わせ表示",
+      "transparency": "透明度:"
+    },
+    "toolbar": {
+      "undo": "元に戻す",
+      "redo": "やり直す",
+      "pen": "ペン",
+      "line": "直線",
+      "ellipse": "楕円",
+      "eraser": "消しゴム",
+      "clearAll": "全消去",
+      "grid": "グリッド",
+      "gridSize": "グリッドサイズ:",
+      "gridOpacity": "グリッドの濃さ:",
+      "color": "色:",
+      "size": "サイズ:",
+      "download": "画像をダウンロード"
+    }
+  },
+  "language": {
+    "select": "言語選択",
+    "ja": "日本語",
+    "en": "English"
+  },
+  "faq": {
+    "title": "よくある質問（Q&A）",
+    "backToApp": "アプリに戻る",
+    "questions": {
+      "q1": {
+        "question": "写真を追加できません",
+        "answer": "対応している画像形式は JPEG、PNG、WEBP です。\n\niPhoneで撮影した写真がHEIC形式の場合、アップロードできません。iPhoneの設定アプリから「カメラ」→「フォーマット」→「互換性優先」に変更すると、JPEG形式で保存されます。\n\nファイルサイズに制限はありませんが、大きすぎる画像（10MB以上）は処理に時間がかかる場合があります。"
+      },
+      "q2": {
+        "question": "写真はどこに保管されていますか？",
+        "answer": "写真はブラウザの IndexedDB（ローカルストレージ）に保管されています。\n\nサーバーには一切送信されず、すべてお使いのデバイス内に保存されます。プライバシーは完全に保護されています。\n\n注意: ブラウザのデータを削除すると、保存した写真も消えてしまいます。定期的にバックアップを取ることをおすすめします。"
+      },
+      "q3": {
+        "question": "バックアップとは何ですか？",
+        "answer": "バックアップ機能は、保存した写真をJSON形式のファイルとしてダウンロードする機能です。\n\n【バックアップの使い方】\n1. 写真管理画面の「バックアップ」ボタンをクリック\n2. JSONファイルがダウンロードされます\n3. このファイルを安全な場所に保管してください\n\n【復元の使い方】\n1. 写真管理画面の「復元」ボタンをクリック\n2. 保存したJSONファイルを選択\n3. 写真が復元されます（重複はスキップされます）\n\nバックアップを使えば、別のデバイスや別のブラウザでも同じ写真を使用できます。"
+      },
+      "q4": {
+        "question": "写真が消えてしまいました",
+        "answer": "写真が消える原因:\n\n• ブラウザのキャッシュ/データをクリアした\n• プライベートモード（シークレットモード）で使用していた\n• 別のブラウザやデバイスで開いた\n\n【対処方法】\nバックアップファイルがあれば、「復元」機能で写真を取り戻すことができます。\n\nバックアップがない場合は、残念ながら写真を復元することはできません。今後は定期的にバックアップを取ることをおすすめします。"
+      },
+      "q5": {
+        "question": "フォルダとは何ですか？",
+        "answer": "フォルダ機能を使うと、写真をジャンル別に整理できます。\n\n【フォルダの作成】\n1. 写真管理画面の「新規フォルダ」ボタンをクリック\n2. フォルダ名を入力（例: 人物、風景、動物）\n\n【写真の振り分け】\n• アップロード時: フォルダを選択してから写真を追加\n• 既存の写真: 3点メニュー（⋮）から「フォルダに移動」\n\n【フォルダ別練習】\n練習開始画面でフォルダを選択すると、そのフォルダ内の写真のみで練習できます。\n\n【フォルダの削除】\nフォルダを削除しても、中の写真は消えません。「全て」フォルダに移動されます。"
+      },
+      "q6": {
+        "question": "iPad/タブレットで使えますか？",
+        "answer": "はい、iPad/タブレットで使用できます。\n\n【使用方法】\n1. iPadでSafariまたはChromeを開く\n2. このアプリのURLにアクセス\n3. 指やApple Pencilで描画できます\n\n【タッチ操作】\n• キャンバスを直接タッチして描画\n• ピンチ操作で拡大縮小（ブラウザ機能）\n• スクロール防止機能により、描画中にページが動きません\n\n【ローカルネットワークでの使用】\nPCで開発サーバーを起動すれば、同じWi-Fiネットワーク上のiPadからアクセスできます。"
+      }
+    }
+  }
+}

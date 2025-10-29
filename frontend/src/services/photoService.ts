@@ -1,0 +1,348 @@
+import { db } from './db';
+import type { Photo } from './db';
+import { v4 as uuidv4 } from 'uuid';
+
+// 画像をリサイズしてData URLを生成（iOS Safari対応: Blob → Data URL）
+export const resizeImage = (
+  file: File,
+  maxWidth: number,
+  maxHeight: number
+): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    console.log(`[resizeImage] Processing file: ${file.name}, type: ${file.type}, size: ${file.size}`);
+
+    const img = new Image();
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      const result = e.target?.result;
+      if (!result) {
+        console.error('[resizeImage] FileReader result is null');
+        reject(new Error('FileReader result is null'));
+        return;
+      }
+      console.log(`[resizeImage] FileReader loaded, data URL length: ${(result as string).length}`);
+      img.src = result as string;
+    };
+
+    img.onload = () => {
+      console.log(`[resizeImage] Image loaded: ${img.width}x${img.height}`);
+
+      const canvas = document.createElement('canvas');
+      let width = img.width;
+      let height = img.height;
+
+      // アスペクト比を維持してリサイズ
+      if (width > height) {
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width;
+          width = maxWidth;
+        }
+      } else {
+        if (height > maxHeight) {
+          width = (width * maxHeight) / height;
+          height = maxHeight;
+        }
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      console.log(`[resizeImage] Canvas size: ${width}x${height}`);
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        console.error('[resizeImage] Canvas context not available');
+        reject(new Error('Canvas context not available'));
+        return;
+      }
+
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // iOS Safari対応: BlobではなくData URLを直接返す
+      try {
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        console.log(`[resizeImage] Data URL created successfully, length: ${dataUrl.length}`);
+        resolve(dataUrl);
+      } catch (error) {
+        console.error('[resizeImage] Failed to create data URL from canvas:', error);
+        reject(new Error('Failed to create data URL'));
+      }
+    };
+
+    img.onerror = (e) => {
+      console.error('[resizeImage] Image load error:', e);
+      reject(new Error(`Failed to load image: ${file.name}`));
+    };
+
+    reader.onerror = (e) => {
+      console.error('[resizeImage] FileReader error:', e);
+      reject(new Error(`Failed to read file: ${file.name}`));
+    };
+
+    reader.readAsDataURL(file);
+  });
+};
+
+// サムネイル生成（Data URL形式）
+export const createThumbnail = (file: File): Promise<string> => {
+  return resizeImage(file, 200, 200);
+};
+
+// 写真を追加
+export const addPhoto = async (file: File, folderId: string | null = null): Promise<string> => {
+  try {
+    console.log(`[addPhoto] Starting upload: ${file.name}, type: ${file.type}, size: ${file.size}, folderId: ${folderId}`);
+
+    // HEIC形式の警告（iOSで一般的だが、ブラウザのサポートが限定的）
+    if (file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic')) {
+      console.warn('[addPhoto] HEIC format detected. This may cause issues on some browsers.');
+      throw new Error('HEIC形式の画像は対応していません。JPEGまたはPNGに変換してください。');
+    }
+
+    // 画像の元のサイズを取得
+    const img = new Image();
+    const reader = new FileReader();
+
+    const dimensions = await new Promise<{ width: number; height: number }>((resolve, reject) => {
+      reader.onload = (e) => {
+        const result = e.target?.result;
+        if (!result) {
+          console.error('[addPhoto] FileReader result is null');
+          reject(new Error('Failed to read file'));
+          return;
+        }
+        img.src = result as string;
+      };
+      img.onload = () => {
+        console.log(`[addPhoto] Original dimensions: ${img.width}x${img.height}`);
+        resolve({ width: img.width, height: img.height });
+      };
+      img.onerror = (e) => {
+        console.error('[addPhoto] Image load error:', e);
+        reject(new Error('Failed to load image'));
+      };
+      reader.onerror = (e) => {
+        console.error('[addPhoto] FileReader error:', e);
+        reject(new Error('Failed to read file'));
+      };
+      reader.readAsDataURL(file);
+    });
+
+    console.log('[addPhoto] Resizing image...');
+    // リサイズ（最大800x800）→ Data URL形式で取得
+    const dataUrl = await resizeImage(file, 800, 800);
+
+    console.log('[addPhoto] Creating thumbnail...');
+    // サムネイル生成 → Data URL形式で取得
+    const thumbnailUrl = await createThumbnail(file);
+
+    const photo: Photo = {
+      id: uuidv4(),
+      folderId: folderId,         // フォルダID（nullは「全て」に表示）
+      filename: file.name,
+      dataUrl: dataUrl,           // Data URL文字列を保存（iOS Safari対応）
+      thumbnailUrl: thumbnailUrl, // サムネイルもData URL文字列
+      width: dimensions.width,
+      height: dimensions.height,
+      fileSize: file.size,
+      addedAt: new Date(),
+      tags: []
+    };
+
+    console.log(`[addPhoto] Saving to IndexedDB... Photo ID: ${photo.id}, dataUrl length: ${dataUrl.length}, thumbnailUrl length: ${thumbnailUrl.length}`);
+    await db.photos.add(photo);
+    console.log('[addPhoto] Photo saved successfully');
+    return photo.id!;
+  } catch (error) {
+    console.error('[addPhoto] Failed to add photo:', error);
+    throw error;
+  }
+};
+
+// 写真を取得
+export const getPhoto = async (id: string): Promise<Photo | undefined> => {
+  return await db.photos.get(id);
+};
+
+// 全写真を取得
+export const getAllPhotos = async (): Promise<Photo[]> => {
+  return await db.photos.orderBy('addedAt').reverse().toArray();
+};
+
+// 写真を削除
+export const deletePhoto = async (id: string): Promise<void> => {
+  await db.photos.delete(id);
+  // 関連する描画データも削除
+  const drawings = await db.drawings.where('photoId').equals(id).toArray();
+  const drawingIds = drawings.map(d => d.id!);
+  await db.drawings.bulkDelete(drawingIds);
+};
+
+// 複数の写真を一括削除
+export const bulkDeletePhotos = async (photoIds: string[]): Promise<void> => {
+  for (const id of photoIds) {
+    await deletePhoto(id);
+  }
+};
+
+// 注意: iOS Safari対応のため、写真はData URL形式で直接保存されています
+// blobToDataURL関数は不要になりました（後方互換性のため残していません）
+
+// ランダムに写真を取得
+export const getRandomPhoto = async (): Promise<Photo | undefined> => {
+  const photos = await getAllPhotos();
+  if (photos.length === 0) return undefined;
+  const randomIndex = Math.floor(Math.random() * photos.length);
+  return photos[randomIndex];
+};
+
+// 指定されたIDを除外してランダムに写真を取得
+export const getRandomPhotoExcept = async (excludeId: string, folderId: string | null = null): Promise<Photo | undefined> => {
+  let photos: Photo[];
+
+  if (folderId === null) {
+    // 「全て」: 全写真から選択
+    photos = await getAllPhotos();
+  } else {
+    // 指定フォルダ内の写真から選択
+    photos = await db.photos.where('folderId').equals(folderId).toArray();
+  }
+
+  // 現在の写真を除外
+  const filteredPhotos = photos.filter(photo => photo.id !== excludeId);
+
+  console.log(`[getRandomPhotoExcept] Total photos: ${photos.length}, Filtered: ${filteredPhotos.length}, Excluded ID: ${excludeId}, FolderId: ${folderId}`);
+
+  if (filteredPhotos.length === 0) {
+    console.warn('[getRandomPhotoExcept] No other photos available');
+    return undefined;
+  }
+
+  const randomIndex = Math.floor(Math.random() * filteredPhotos.length);
+  const selectedPhoto = filteredPhotos[randomIndex];
+  console.log(`[getRandomPhotoExcept] Selected photo ID: ${selectedPhoto.id}, filename: ${selectedPhoto.filename}`);
+
+  return selectedPhoto;
+};
+
+// 写真を順序で取得（oldest/newest/random）
+export const getPhotoByOrder = async (order: 'oldest' | 'newest' | 'random', folderId: string | null = null): Promise<Photo | undefined> => {
+  if (order === 'random') {
+    if (folderId === null) {
+      return getRandomPhoto();
+    }
+    const photos = await db.photos.where('folderId').equals(folderId).toArray();
+    if (photos.length === 0) return undefined;
+    const randomIndex = Math.floor(Math.random() * photos.length);
+    return photos[randomIndex];
+  }
+
+  let photos: Photo[];
+
+  if (folderId === null) {
+    // 「全て」: 全写真から選択
+    photos = order === 'oldest'
+      ? await db.photos.orderBy('addedAt').toArray()
+      : await db.photos.orderBy('addedAt').reverse().toArray();
+  } else {
+    // 指定フォルダ内の写真から選択
+    const folderPhotos = await db.photos.where('folderId').equals(folderId).toArray();
+    photos = order === 'oldest'
+      ? folderPhotos.sort((a, b) => a.addedAt.getTime() - b.addedAt.getTime())
+      : folderPhotos.sort((a, b) => b.addedAt.getTime() - a.addedAt.getTime());
+  }
+
+  if (photos.length === 0) return undefined;
+  return photos[0];
+};
+
+// ===== バックアップ・復元機能 =====
+
+// バックアップ用のJSONインターフェース
+export interface PhotoBackup {
+  version: string;
+  exportDate: string;
+  totalPhotos: number;
+  photos: Photo[];
+}
+
+// 全写真をJSON形式でエクスポート
+export const exportPhotosToJSON = async (): Promise<string> => {
+  try {
+    console.log('[exportPhotosToJSON] Starting export...');
+    const photos = await getAllPhotos();
+
+    const backup: PhotoBackup = {
+      version: '1.0',
+      exportDate: new Date().toISOString(),
+      totalPhotos: photos.length,
+      photos: photos
+    };
+
+    const jsonString = JSON.stringify(backup, null, 2);
+    console.log(`[exportPhotosToJSON] Successfully exported ${photos.length} photos, JSON size: ${jsonString.length} bytes`);
+
+    return jsonString;
+  } catch (error) {
+    console.error('[exportPhotosToJSON] Export failed:', error);
+    throw new Error('写真のエクスポートに失敗しました');
+  }
+};
+
+// JSONファイルから写真をインポート（重複チェック付き）
+export const importPhotosFromJSON = async (jsonString: string): Promise<{ imported: number; skipped: number; errors: number }> => {
+  try {
+    console.log('[importPhotosFromJSON] Starting import...');
+
+    // JSONパース
+    const backup: PhotoBackup = JSON.parse(jsonString);
+    console.log(`[importPhotosFromJSON] Backup version: ${backup.version}, Total photos in backup: ${backup.totalPhotos}`);
+
+    // 既存の写真IDを取得
+    const existingPhotos = await getAllPhotos();
+    const existingIds = new Set(existingPhotos.map(p => p.id));
+    console.log(`[importPhotosFromJSON] Existing photos: ${existingIds.size}`);
+
+    let imported = 0;
+    let skipped = 0;
+    let errors = 0;
+
+    // 各写真をインポート
+    for (const photo of backup.photos) {
+      try {
+        // 重複チェック
+        if (existingIds.has(photo.id)) {
+          console.log(`[importPhotosFromJSON] Skipping duplicate photo: ${photo.id} (${photo.filename})`);
+          skipped++;
+          continue;
+        }
+
+        // Data URLの検証
+        if (!photo.dataUrl || !photo.dataUrl.startsWith('data:image/')) {
+          console.error(`[importPhotosFromJSON] Invalid dataUrl for photo: ${photo.id}`);
+          errors++;
+          continue;
+        }
+
+        // 写真を追加（addedAtをDateオブジェクトに変換）
+        await db.photos.add({
+          ...photo,
+          addedAt: new Date(photo.addedAt)
+        });
+
+        console.log(`[importPhotosFromJSON] Imported photo: ${photo.id} (${photo.filename})`);
+        imported++;
+      } catch (error) {
+        console.error(`[importPhotosFromJSON] Failed to import photo ${photo.id}:`, error);
+        errors++;
+      }
+    }
+
+    console.log(`[importPhotosFromJSON] Import complete. Imported: ${imported}, Skipped: ${skipped}, Errors: ${errors}`);
+
+    return { imported, skipped, errors };
+  } catch (error) {
+    console.error('[importPhotosFromJSON] Import failed:', error);
+    throw new Error('写真のインポートに失敗しました。ファイル形式を確認してください。');
+  }
+};
