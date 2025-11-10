@@ -25,6 +25,7 @@
     },
     "folders": {
       "title": "フォルダ",
+      "description": "『手』『猫』『ポーズ』などフォルダを作成すると、フォルダ別に練習が可能になります",
       "allPhotos": "全て",
       "createFolder": "新規フォルダ",
       "folderName": "フォルダ名",
@@ -87,7 +88,8 @@
     "invalidFileType": "対応していないファイル形式です: {{files}}"
   },
   "drawingTool": {
-    "title": "顔ジェスチャードローイング学習ツール",
+    "title": "Gesdro!",
+    "subtitle": "顔ジェスチャードローイング学習ツール",
     "backToPhotos": "写真一覧に戻る",
     "currentStep": "Step {{step}}: {{description}}",
     "steps": {

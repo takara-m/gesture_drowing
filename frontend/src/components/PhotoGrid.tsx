@@ -177,7 +177,7 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({ selectedFolderId = null, o
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-procreate-accent"></div>
       </div>
     );
   }
@@ -185,7 +185,7 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({ selectedFolderId = null, o
   if (photos.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500 text-lg">{t('photoGrid.noPhotos')}</p>
+        <p className="text-gray-300 text-lg">{t('photoGrid.noPhotos')}</p>
         <p className="text-gray-400 mt-2">{t('photoGrid.noPhotosDescription')}</p>
       </div>
     );
@@ -197,10 +197,10 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({ selectedFolderId = null, o
       <div className="mb-4 flex items-center justify-between">
         <button
           onClick={toggleSelectionMode}
-          className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+          className={`px-4 py-2 rounded-xl font-semibold transition-all hover:scale-[0.98] active:scale-[0.98] ${
             selectionMode
-              ? 'bg-indigo-600 text-white'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              ? 'bg-procreate-accent text-white'
+              : 'bg-procreate-tag text-white hover:bg-procreate-hover'
           }`}
         >
           {selectionMode ? (
@@ -218,14 +218,14 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({ selectedFolderId = null, o
           <div className="flex gap-2">
             <button
               onClick={openBulkMoveModal}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-procreate-tag text-white rounded-xl hover:bg-procreate-hover hover:scale-[0.98] active:scale-[0.98] transition-all flex items-center gap-2"
             >
               <FolderIcon size={18} />
               {t('photoGrid.bulkMove')}
             </button>
             <button
               onClick={handleBulkDelete}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 hover:scale-[0.98] active:scale-[0.98] transition-all flex items-center gap-2"
             >
               <Trash2 size={18} />
               {t('photoGrid.bulkDelete')}
@@ -236,7 +236,7 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({ selectedFolderId = null, o
         {selectionMode && (
           <button
             onClick={toggleSelectionMode}
-            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+            className="px-4 py-2 bg-procreate-tag text-white rounded-xl hover:bg-procreate-hover hover:scale-[0.98] active:scale-[0.98] transition-all"
           >
             {t('photoGrid.cancelSelection')}
           </button>
@@ -248,7 +248,7 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({ selectedFolderId = null, o
         {photos.map((photo) => (
           <div
             key={photo.id}
-            className="relative group bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow"
+            className="relative group bg-procreate-card rounded-lg shadow-md hover:shadow-xl transition-shadow"
           >
             {/* 選択モード時のチェックボックス */}
             {selectionMode && (
@@ -274,17 +274,17 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({ selectedFolderId = null, o
 
                 {/* コンテキストメニュー */}
                 {showContextMenu === photo.id && (
-                  <div className="absolute right-0 mt-1 bg-white rounded-lg shadow-xl border border-gray-200 py-1 min-w-[150px]">
+                  <div className="absolute right-0 mt-1 bg-procreate-tag rounded-lg shadow-xl border border-gray-600 py-1 min-w-[150px]">
                     <button
                       onClick={() => openSingleMoveModal(photo.id!)}
-                      className="w-full px-4 py-2 text-left hover:bg-gray-100 flex items-center gap-2"
+                      className="w-full px-4 py-2 text-left text-white hover:bg-procreate-hover flex items-center gap-2"
                     >
                       <FolderIcon size={16} />
                       {t('photoGrid.moveToFolder')}
                     </button>
                     <button
                       onClick={() => handleSingleDelete(photo.id!)}
-                      className="w-full px-4 py-2 text-left hover:bg-gray-100 flex items-center gap-2 text-red-600"
+                      className="w-full px-4 py-2 text-left hover:bg-procreate-hover flex items-center gap-2 text-red-500"
                     >
                       <Trash2 size={16} />
                       {t('common.delete')}
@@ -296,19 +296,19 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({ selectedFolderId = null, o
 
             {/* サムネイル */}
             <div
-              className="aspect-square overflow-hidden bg-gray-100 flex items-center justify-center cursor-pointer"
+              className="aspect-square overflow-hidden bg-procreate-bg rounded-lg flex items-center justify-center cursor-pointer"
               onClick={() => !selectionMode && openImageModal(photo)}
             >
               {errorPhotos.has(photo.id!) ? (
                 <div className="text-center p-4">
                   <p className="text-red-500 text-sm font-semibold mb-1">{t('photoGrid.loadError')}</p>
-                  <p className="text-xs text-gray-500">{t('photoGrid.loadErrorDescription')}</p>
+                  <p className="text-xs text-gray-400">{t('photoGrid.loadErrorDescription')}</p>
                 </div>
               ) : thumbnailUrls.get(photo.id!) ? (
                 <img
                   src={thumbnailUrls.get(photo.id!)}
                   alt={photo.filename}
-                  className="w-full h-full object-cover hover:scale-110 transition-transform"
+                  className="w-full h-full object-cover hover:scale-110 transition-transform rounded-lg"
                 />
               ) : (
                 <div className="text-gray-400">{t('common.loading')}</div>
@@ -316,11 +316,11 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({ selectedFolderId = null, o
             </div>
 
             {/* ファイル名 */}
-            <div className="p-2 bg-white">
-              <p className="text-xs text-gray-600 truncate" title={photo.filename}>
+            <div className="p-2 bg-procreate-card">
+              <p className="text-xs text-gray-300 truncate" title={photo.filename}>
                 {photo.filename}
               </p>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-gray-500">
                 {new Date(photo.addedAt).toLocaleDateString()}
               </p>
             </div>
@@ -360,14 +360,14 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({ selectedFolderId = null, o
       {/* フォルダ移動モーダル */}
       {showMoveModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
-            <h3 className="text-xl font-bold text-gray-800 mb-4">{t('photoGrid.selectFolder')}</h3>
+          <div className="bg-procreate-card rounded-lg shadow-2xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold text-white mb-4">{t('photoGrid.selectFolder')}</h3>
 
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {/* 「全て」フォルダ */}
               <button
                 onClick={() => handleMoveToFolder(null)}
-                className="w-full px-4 py-3 text-left bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-2"
+                className="w-full px-4 py-3 text-left text-white bg-procreate-tag hover:bg-procreate-hover rounded-lg transition-colors flex items-center gap-2"
               >
                 <FolderIcon size={18} />
                 {t('photoManager.folders.allPhotos')}
@@ -378,7 +378,7 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({ selectedFolderId = null, o
                 <button
                   key={folder.id}
                   onClick={() => handleMoveToFolder(folder.id)}
-                  className="w-full px-4 py-3 text-left bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-2"
+                  className="w-full px-4 py-3 text-left text-white bg-procreate-tag hover:bg-procreate-hover rounded-lg transition-colors flex items-center gap-2"
                 >
                   <FolderIcon size={18} />
                   {folder.name}
@@ -391,7 +391,7 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({ selectedFolderId = null, o
                 setShowMoveModal(false);
                 setMoveTargetPhotos([]);
               }}
-              className="mt-4 w-full px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+              className="mt-4 w-full px-4 py-2 bg-procreate-tag text-white rounded-xl hover:bg-procreate-hover hover:scale-[0.98] active:scale-[0.98] transition-all"
             >
               {t('common.cancel')}
             </button>

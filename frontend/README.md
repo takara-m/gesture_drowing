@@ -1,73 +1,139 @@
-# React + TypeScript + Vite
+# Gesdro!
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Gesdro!** is a progressive face gesture drawing learning tool designed to help users improve their portrait drawing skills through a structured 2-step learning system.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 2-Step Learning System
 
-## React Compiler
+**Step 1: Tracing Mode**
+- Draw directly over reference photos
+- Adjustable photo opacity for gradual difficulty increase
+- Build muscle memory and understand facial proportions
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+**Step 2: Independent Drawing Mode**
+- Draw next to the reference photo without tracing
+- Optional answer-checking overlay with adjustable opacity
+- Develop observation and free-hand drawing skills
 
-## Expanding the ESLint configuration
+### Drawing Tools
+- **Pen Tool**: Freehand drawing with customizable brush size and color
+- **Line Tool**: Draw straight lines for construction and guidelines
+- **Ellipse Tool**: Create ellipses and circles for facial features
+- **Eraser**: Remove mistakes with adjustable eraser size
+- **Undo/Redo**: Full drawing history management
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Photo Management
+- **Upload Photos**: Drag & drop or select multiple photos at once
+- **Folder Organization**: Create custom folders to organize reference photos
+- **Practice Mode**: Select photos by oldest, newest, or random order
+- **Folder Filtering**: Practice with photos from specific folders
+- **Backup & Restore**: Export/import all photos and folders as JSON
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Additional Features
+- **Multi-language Support**: Japanese and English
+- **iPad/Tablet Support**: Touch-friendly interface with Apple Pencil support
+- **Local Storage**: All data stored in browser (IndexedDB)
+- **Download Drawings**: Save your completed drawings as PNG
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Tech Stack
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- **React 19** - UI framework
+- **TypeScript** - Type-safe development
+- **Vite** - Fast build tool and dev server
+- **Tailwind CSS** - Utility-first styling
+- **Dexie.js** - IndexedDB wrapper for data storage
+- **Lucide React** - Icon library
+- **HTML5 Canvas** - Native drawing API
+
+## Getting Started
+
+### Prerequisites
+- Node.js (v18 or higher)
+- npm or yarn
+
+### Installation
+
+```bash
+# Navigate to frontend directory
+cd frontend
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The app will be available at `http://localhost:5173`
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### iPad/Tablet Testing
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+To test on iPad or other devices on the same network:
+
+1. Start the dev server (it's configured with `--host 0.0.0.0`)
+2. Note the network address shown in the terminal (e.g., `http://192.168.1.100:5173`)
+3. Connect your iPad to the same Wi-Fi network
+4. Open Safari/Chrome on iPad and navigate to the network address
+
+### Build for Production
+
+```bash
+npm run build
 ```
+
+## Project Structure
+
+```
+frontend/
+├── src/
+│   ├── components/          # React components
+│   │   ├── FaceGestureDrawingTool.tsx  # Main drawing interface
+│   │   ├── PhotoUploader.tsx           # Photo upload component
+│   │   └── PhotoGrid.tsx               # Photo gallery
+│   ├── pages/               # Page components
+│   │   ├── PhotoManager.tsx            # Photo management page
+│   │   └── FAQ.tsx                     # FAQ page
+│   ├── services/            # Business logic
+│   │   ├── db.ts                       # Dexie database schema
+│   │   ├── photoService.ts             # Photo CRUD operations
+│   │   └── folderService.ts            # Folder operations
+│   ├── i18n/                # Internationalization
+│   │   ├── locales/
+│   │   │   ├── ja.json                 # Japanese translations
+│   │   │   └── en.json                 # English translations
+│   │   └── contexts/
+│   │       └── LanguageContext.tsx     # Language state
+│   ├── assets/              # Static assets (logo, images)
+│   ├── App.tsx              # Main app component
+│   └── main.tsx             # Entry point
+├── public/                  # Public assets
+└── package.json
+```
+
+## Key Technical Details
+
+### Canvas Drawing
+- Uses native HTML5 Canvas API (not Fabric.js)
+- Supports both mouse and touch input
+- Dynamic canvas sizing to match photo aspect ratio
+- Drawing history with undo/redo functionality
+
+### Data Storage
+- All photos stored as Data URLs (iOS Safari compatible)
+- IndexedDB via Dexie.js for persistent storage
+- No backend required - fully client-side
+
+### Photo Organization
+- User-created folders with custom names
+- Special "All Photos" view showing unorganized photos
+- Photo count displayed for each folder
+- Bulk photo operations (move, delete)
+
+## License
+
+This project is private and not licensed for public use.
+
+## Development Notes
+
+For detailed technical documentation and development guidelines, see [CLAUDE.md](../CLAUDE.md).

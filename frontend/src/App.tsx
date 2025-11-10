@@ -1,10 +1,12 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Globe, HelpCircle } from 'lucide-react'
 import FaceGestureDrawingTool from './components/FaceGestureDrawingTool'
 import { PhotoManager } from './pages/PhotoManager'
 import FAQ from './pages/FAQ'
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext'
+import { AdSenseProvider, useAdSenseContext } from './contexts/AdSenseContext'
 import type { Photo } from './services/db'
+import { AdSenseScript, AdInterstitial } from './components/ads'
 import './App.css'
 
 function AppContent() {
@@ -12,6 +14,36 @@ function AppContent() {
   const [currentView, setCurrentView] = useState<'drawing' | 'photos' | 'faq'>('photos')
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null)
   const [practiceFolderId, setPracticeFolderId] = useState<string | null>(null)
+  const [previousView, setPreviousView] = useState<'drawing' | 'photos' | 'faq'>('photos')
+  const [viewBeforeFAQ, setViewBeforeFAQ] = useState<'drawing' | 'photos'>('photos')
+
+  // 広告管理用のContext
+  const { showInterstitial, triggerInterstitial, closeInterstitial } = useAdSenseContext()
+
+  // ビュー変更を検出してインタースティシャル広告を表示
+  useEffect(() => {
+    if (previousView !== currentView) {
+      console.log(`[App] View changed: ${previousView} -> ${currentView}`);
+
+      // 練習画面から戻る際は広告をスキップ
+      if (previousView === 'drawing' && currentView === 'photos') {
+        console.log('[App] Returning from practice screen, skipping interstitial ad');
+        setPreviousView(currentView);
+        return;
+      }
+
+      // FAQ関連の遷移は広告をスキップ（開く・戻る両方）
+      if (currentView === 'faq' || previousView === 'faq') {
+        console.log('[App] FAQ transition, skipping interstitial ad');
+        setPreviousView(currentView);
+        return;
+      }
+
+      // その他の遷移は広告を表示
+      triggerInterstitial();
+      setPreviousView(currentView);
+    }
+  }, [currentView, previousView, triggerInterstitial])
 
   const handlePhotoSelect = (photo: Photo, folderId: string | null = null) => {
     setSelectedPhoto(photo)
@@ -25,12 +57,23 @@ function AppContent() {
 
   return (
     <>
-      {/* ヘッダーボタン（固定位置） */}
-      <div className="fixed top-4 right-4 z-50 flex gap-2">
+      {/* Google AdSenseスクリプト読み込み */}
+      <AdSenseScript clientId={import.meta.env.VITE_ADSENSE_CLIENT_ID || 'ca-pub-0000000000000000'} />
+
+      {/* インタースティシャル広告 */}
+      <AdInterstitial show={showInterstitial} onClose={closeInterstitial} />
+
+      {/* ヘッダーボタン（固定位置・レスポンシブ対応） */}
+      <div className="fixed top-4 right-4 z-50 flex flex-col sm:flex-row gap-2">
         {/* ヘルプボタン */}
         <button
-          onClick={() => setCurrentView('faq')}
-          className="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 rounded-lg hover:bg-gray-100 shadow-lg transition-colors border border-gray-300"
+          onClick={() => {
+            if (currentView !== 'faq') {
+              setViewBeforeFAQ(currentView as 'drawing' | 'photos');
+            }
+            setCurrentView('faq');
+          }}
+          className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-procreate-card text-white rounded-xl hover:bg-procreate-hover shadow-lg transition-all hover:scale-[0.98] active:scale-[0.98] border border-gray-600"
           title="FAQ"
         >
           <HelpCircle size={20} />
@@ -39,16 +82,16 @@ function AppContent() {
         {/* 言語切り替えボタン */}
         <button
           onClick={toggleLanguage}
-          className="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 rounded-lg hover:bg-gray-100 shadow-lg transition-colors border border-gray-300"
+          className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-procreate-card text-white rounded-xl hover:bg-procreate-hover shadow-lg transition-all hover:scale-[0.98] active:scale-[0.98] border border-gray-600"
           title={t('language.select')}
         >
           <Globe size={20} />
-          <span className="font-semibold">{language === 'ja' ? '日本語' : 'English'}</span>
+          <span className="hidden sm:inline font-semibold">{language === 'ja' ? '日本語' : 'English'}</span>
         </button>
       </div>
 
       {currentView === 'faq' ? (
-        <FAQ onBack={() => setCurrentView('photos')} />
+        <FAQ onBack={() => setCurrentView(viewBeforeFAQ)} />
       ) : currentView === 'photos' ? (
         <PhotoManager onPhotoSelect={handlePhotoSelect} />
       ) : (
@@ -65,7 +108,9 @@ function AppContent() {
 function App() {
   return (
     <LanguageProvider>
-      <AppContent />
+      <AdSenseProvider>
+        <AppContent />
+      </AdSenseProvider>
     </LanguageProvider>
   )
 }

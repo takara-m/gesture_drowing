@@ -6,6 +6,8 @@ import { useLanguage } from '../contexts/LanguageContext';
 import type { Photo, Folder } from '../services/db';
 import { getPhotoByOrder, exportPhotosToJSON, importPhotosFromJSON } from '../services/photoService';
 import { getAllFolders, createFolder, deleteFolder, getPhotoCountInFolder } from '../services/folderService';
+import { AnimatedLogo } from '../components/AnimatedLogo';
+import { AdBanner } from '../components/ads';
 
 interface PhotoManagerProps {
   onPhotoSelect?: (photo: Photo, folderId?: string | null) => void;
@@ -59,7 +61,7 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
     }
   };
 
-  // フォルダ作成
+  // フォルダ作成（セキュリティ強化: バリデーション追加）
   const handleCreateFolder = async () => {
     const folderName = prompt(t('photoManager.folders.createPrompt'));
     if (!folderName || folderName.trim() === '') {
@@ -69,7 +71,28 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
       return;
     }
 
-    await createFolder(folderName.trim());
+    const sanitizedName = folderName.trim();
+
+    // 1. 長さ制限（50文字）
+    if (sanitizedName.length > 50) {
+      alert('フォルダ名は50文字以内にしてください');
+      return;
+    }
+
+    // 2. 特殊文字チェック（英数字、日本語、スペース、ハイフン、アンダースコアのみ許可）
+    const FOLDER_NAME_REGEX = /^[a-zA-Z0-9\s\-_\u3000-\u9FFF\u3040-\u309F\u30A0-\u30FF]+$/;
+    if (!FOLDER_NAME_REGEX.test(sanitizedName)) {
+      alert('フォルダ名に使用できない文字が含まれています');
+      return;
+    }
+
+    // 3. パストラバーサル対策
+    if (sanitizedName.includes('..') || sanitizedName.includes('/') || sanitizedName.includes('\\')) {
+      alert('無効なフォルダ名です');
+      return;
+    }
+
+    await createFolder(sanitizedName);
     await loadFolders();
     setGridKey(prev => prev + 1); // PhotoGridを再マウントしてfoldersを更新
   };
@@ -159,32 +182,40 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
+    <div className="min-h-screen bg-procreate-bg p-6">
+      {/* ロゴセクション（最上部・中央寄せ・レスポンシブ） */}
+      <div className="flex justify-center mb-8">
+        <AnimatedLogo />
+      </div>
+
+      {/* バナー広告（ロゴ下） */}
+      <AdBanner slot="1234567890" format="auto" responsive={true} />
+
       <div className="max-w-7xl mx-auto space-y-6">
         {/* ①練習開始セクション */}
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
-          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border-2 border-green-200">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <Play size={28} className="text-green-600" />
+        <div className="bg-procreate-card rounded-lg shadow-md p-8">
+          <div className="bg-procreate-tag rounded-lg p-6">
+            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+              <Play size={28} className="text-procreate-accent" />
               {t('photoManager.practiceStart.title')}
             </h2>
-            <p className="text-sm text-gray-700 mb-4">
+            <p className="text-sm text-gray-300 mb-4">
               {t('photoManager.practiceStart.description')}
             </p>
 
             {/* フォルダ選択 */}
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-white mb-2">
                 {t('photoManager.practiceStart.folder')}
               </label>
               <select
                 value={practiceFolderId || ''}
                 onChange={(e) => setPracticeFolderId(e.target.value || null)}
-                className="w-full max-w-xs px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full max-w-xs px-4 py-2 bg-procreate-bg text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-procreate-accent focus:border-transparent"
               >
-                <option value="">{t('photoManager.practiceStart.allPhotos')} ({folderPhotoCounts.get(null) || 0})</option>
+                <option className="bg-white text-gray-900" value="">{t('photoManager.practiceStart.allPhotos')} ({folderPhotoCounts.get(null) || 0})</option>
                 {folders.map(folder => (
-                  <option key={folder.id} value={folder.id}>
+                  <option className="bg-white text-gray-900" key={folder.id} value={folder.id}>
                     {folder.name} ({folderPhotoCounts.get(folder.id) || 0})
                   </option>
                 ))}
@@ -196,30 +227,30 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => setSelectedOrder('oldest')}
-                  className={`px-3 py-2 rounded-lg font-semibold transition-colors ${
+                  className={`px-3 py-2 rounded-xl font-semibold transition-all hover:scale-[0.98] active:scale-[0.98] ${
                     selectedOrder === 'oldest'
-                      ? 'bg-green-600 text-white shadow-lg'
-                      : 'bg-white text-gray-700 hover:bg-gray-100 border-2 border-gray-200'
+                      ? 'bg-procreate-accent text-white shadow-lg'
+                      : 'bg-procreate-bg text-white hover:bg-procreate-hover'
                   }`}
                 >
                   {t('photoManager.practiceStart.oldest')}
                 </button>
                 <button
                   onClick={() => setSelectedOrder('newest')}
-                  className={`px-3 py-2 rounded-lg font-semibold transition-colors ${
+                  className={`px-3 py-2 rounded-xl font-semibold transition-all hover:scale-[0.98] active:scale-[0.98] ${
                     selectedOrder === 'newest'
-                      ? 'bg-green-600 text-white shadow-lg'
-                      : 'bg-white text-gray-700 hover:bg-gray-100 border-2 border-gray-200'
+                      ? 'bg-procreate-accent text-white shadow-lg'
+                      : 'bg-procreate-bg text-white hover:bg-procreate-hover'
                   }`}
                 >
                   {t('photoManager.practiceStart.newest')}
                 </button>
                 <button
                   onClick={() => setSelectedOrder('random')}
-                  className={`px-3 py-2 rounded-lg font-semibold transition-colors ${
+                  className={`px-3 py-2 rounded-xl font-semibold transition-all hover:scale-[0.98] active:scale-[0.98] ${
                     selectedOrder === 'random'
-                      ? 'bg-green-600 text-white shadow-lg'
-                      : 'bg-white text-gray-700 hover:bg-gray-100 border-2 border-gray-200'
+                      ? 'bg-procreate-accent text-white shadow-lg'
+                      : 'bg-procreate-bg text-white hover:bg-procreate-hover'
                   }`}
                 >
                   {t('photoManager.practiceStart.random')}
@@ -227,7 +258,7 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
               </div>
               <button
                 onClick={handleStartPractice}
-                className="flex items-center gap-2 px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-bold text-lg"
+                className="flex items-center gap-2 px-8 py-3 bg-procreate-accent text-white rounded-xl hover:bg-blue-600 hover:scale-[0.98] active:scale-[0.98] transition-all font-bold text-lg"
               >
                 <Play size={24} />
                 {t('photoManager.practiceStart.startButton')}
@@ -237,19 +268,26 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
         </div>
 
         {/* ②フォルダセクション */}
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
+        <div className="bg-procreate-card rounded-lg shadow-md p-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-              <FolderIcon size={28} className="text-indigo-600" />
+            <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+              <FolderIcon size={28} className="text-procreate-accent" />
               {t('photoManager.folders.title')}
             </h2>
             <button
               onClick={handleCreateFolder}
-              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold"
+              className="flex items-center gap-2 px-4 py-2 bg-procreate-accent text-white rounded-xl hover:bg-blue-600 hover:scale-[0.98] active:scale-[0.98] transition-all font-semibold"
             >
               <Plus size={20} />
               {t('photoManager.folders.createFolder')}
             </button>
+          </div>
+
+          {/* フォルダ機能の説明 */}
+          <div className="bg-procreate-tag rounded-lg p-4 mb-6">
+            <p className="text-sm text-gray-300">
+              💡 {t('photoManager.folders.description')}
+            </p>
           </div>
 
           {/* フォルダリスト（横スクロール） */}
@@ -257,13 +295,13 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
             {/* 「全て」フォルダ */}
             <button
               onClick={() => setSelectedFolderId(null)}
-              className={`flex-shrink-0 flex items-center gap-2 px-4 py-3 rounded-lg font-semibold transition-colors ${
+              className={`flex-shrink-0 flex items-center gap-2 px-[14px] py-[6px] rounded-full font-semibold transition-all hover:scale-[0.98] active:scale-[0.98] ${
                 selectedFolderId === null
-                  ? 'bg-indigo-600 text-white shadow-lg'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-gray-300'
+                  ? 'bg-procreate-accent text-white shadow-lg'
+                  : 'bg-procreate-tag text-white hover:bg-procreate-hover'
               }`}
             >
-              <FolderIcon size={20} />
+              <FolderIcon size={18} />
               {t('photoManager.folders.allPhotos')} ({folderPhotoCounts.get(null) || 0})
             </button>
 
@@ -272,13 +310,13 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
               <div key={folder.id} className="flex-shrink-0 flex items-center gap-2">
                 <button
                   onClick={() => setSelectedFolderId(folder.id)}
-                  className={`flex items-center gap-2 px-4 py-3 rounded-lg font-semibold transition-colors ${
+                  className={`flex items-center gap-2 px-[14px] py-[6px] rounded-full font-semibold transition-all hover:scale-[0.98] active:scale-[0.98] ${
                     selectedFolderId === folder.id
-                      ? 'bg-indigo-600 text-white shadow-lg'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-gray-300'
+                      ? 'bg-procreate-accent text-white shadow-lg'
+                      : 'bg-procreate-tag text-white hover:bg-procreate-hover'
                   }`}
                 >
-                  <FolderIcon size={20} />
+                  <FolderIcon size={18} />
                   {folder.name} ({folderPhotoCounts.get(folder.id) || 0})
                 </button>
 
@@ -286,10 +324,10 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
                 {selectedFolderId === folder.id && (
                   <button
                     onClick={() => handleDeleteFolder(folder.id)}
-                    className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                    className="p-2 bg-red-600 text-white rounded-xl hover:bg-red-700 hover:scale-[0.98] active:scale-[0.98] transition-all"
                     title={t('photoManager.folders.deleteFolder')}
                   >
-                    <Trash2 size={18} />
+                    <Trash2 size={16} />
                   </button>
                 )}
               </div>
@@ -298,17 +336,17 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
         </div>
 
         {/* ③写真管理セクション */}
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
+        <div className="bg-procreate-card rounded-lg shadow-md p-8">
           <div className="mb-8">
             <div className="flex flex-wrap items-center justify-between mb-6 gap-4">
-              <h1 className="text-3xl font-bold text-gray-800">
+              <h1 className="text-3xl font-bold text-white">
                 {t('photoManager.title')}
               </h1>
 
               <div className="flex flex-wrap gap-3">
                 <button
                   onClick={() => setShowUploader(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold"
+                  className="flex items-center gap-2 px-4 py-2 bg-procreate-accent text-white rounded-xl hover:bg-blue-600 hover:scale-[0.98] active:scale-[0.98] transition-all font-semibold"
                 >
                   <Plus size={20} />
                   {t('photoManager.management.addPhoto')}
@@ -316,7 +354,7 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
 
                 <button
                   onClick={handleBackup}
-                  className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
+                  className="flex items-center gap-2 px-4 py-2 bg-procreate-tag text-white rounded-xl hover:bg-procreate-hover hover:scale-[0.98] active:scale-[0.98] transition-all font-semibold"
                 >
                   <Download size={20} />
                   {t('photoManager.management.backup')}
@@ -324,7 +362,7 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
 
                 <button
                   onClick={handleRestore}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                  className="flex items-center gap-2 px-4 py-2 bg-procreate-tag text-white rounded-xl hover:bg-procreate-hover hover:scale-[0.98] active:scale-[0.98] transition-all font-semibold"
                 >
                   <UploadIcon size={20} />
                   {t('photoManager.management.restore')}
@@ -342,26 +380,26 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
             </div>
 
             {/* 説明 */}
-            <div className="bg-blue-50 rounded-lg p-4">
-              <p className="text-sm text-gray-700">
+            <div className="bg-procreate-tag rounded-lg p-4">
+              <p className="text-sm text-gray-300">
                 💡 {t('photoManager.management.hint')}
               </p>
             </div>
 
             {/* バックアップ・復元のステータスメッセージ */}
             {backupStatus && (
-              <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4">
-                <p className="text-sm text-green-800">{backupStatus}</p>
+              <div className="mt-4 bg-procreate-tag border border-procreate-accent rounded-lg p-4">
+                <p className="text-sm text-procreate-accent">{backupStatus}</p>
               </div>
             )}
           </div>
 
           {/* 区切り線 */}
-          <div className="border-t border-gray-200 mb-8"></div>
+          <div className="border-t border-gray-600 mb-8"></div>
 
           {/* 保存された写真グリッド */}
           <div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">
+            <h2 className="text-2xl font-bold text-white mb-6">
               {t('photoManager.savedPhotos')}
               {selectedFolderId === null
                 ? ` (${t('photoManager.folders.allPhotos')}: ${folderPhotoCounts.get(null) || 0})`
@@ -387,6 +425,13 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
             />
           </div>
         )}
+
+        {/* フッター（コピーライト表記） */}
+        <footer className="mt-12 pb-6 text-center">
+          <p className="text-sm text-gray-400">
+            © 2025 あんにゅい. All rights reserved.
+          </p>
+        </footer>
       </div>
     </div>
   );

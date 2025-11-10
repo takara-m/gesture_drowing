@@ -36,45 +36,75 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({ onUploadComplete, 
     handleFiles(files);
   };
 
-  const handleFiles = (files: File[]) => {
+  // セキュリティ強化: ファイル検証関数
+  const validateImageFile = async (file: File): Promise<{ valid: boolean; error?: string }> => {
+    // 1. ファイルサイズチェック (10MB制限)
+    const MAX_FILE_SIZE = 10 * 1024 * 1024;
+    if (file.size > MAX_FILE_SIZE) {
+      return { valid: false, error: `ファイルサイズが10MBを超えています` };
+    }
+
+    // 2. MIMEタイプホワイトリスト
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      if (file.type === 'image/heic' || file.type === 'image/heif' ||
+          file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif')) {
+        return { valid: false, error: 'HEIC形式は対応していません' };
+      }
+      if (file.type === 'image/svg+xml' || file.name.toLowerCase().endsWith('.svg')) {
+        return { valid: false, error: 'SVG形式はセキュリティ上サポートされていません' };
+      }
+      return { valid: false, error: '対応していないファイル形式です' };
+    }
+
+    // 3. マジックバイト検証（拡張子偽装対策）
+    try {
+      const buffer = await file.arrayBuffer();
+      const bytes = new Uint8Array(buffer.slice(0, 12));
+
+      const isJPEG = bytes[0] === 0xFF && bytes[1] === 0xD8 && bytes[2] === 0xFF;
+      const isPNG = bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4E && bytes[3] === 0x47;
+      const isWebP = bytes.length >= 12 && bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50;
+
+      if ((file.type === 'image/jpeg' && !isJPEG) ||
+          (file.type === 'image/png' && !isPNG) ||
+          (file.type === 'image/webp' && !isWebP)) {
+        return { valid: false, error: 'ファイルの内容が宣言された形式と一致しません' };
+      }
+    } catch (error) {
+      return { valid: false, error: 'ファイルの検証に失敗しました' };
+    }
+
+    return { valid: true };
+  };
+
+  const handleFiles = async (files: File[]) => {
     console.log('[PhotoUploader] Processing files:', files.map(f => `${f.name} (${f.type})`).join(', '));
 
     const newWarnings: string[] = [];
+    const validFiles: File[] = [];
 
-    // HEIC形式のファイルを検出して警告
-    const heicFiles = files.filter(file =>
-      file.type === 'image/heic' ||
-      file.type === 'image/heif' ||
-      file.name.toLowerCase().endsWith('.heic') ||
-      file.name.toLowerCase().endsWith('.heif')
-    );
-
-    if (heicFiles.length > 0) {
-      const heicNames = heicFiles.map(f => f.name).join(', ');
-      newWarnings.push(`HEIC形式の画像は対応していません: ${heicNames}`);
-      console.warn('[PhotoUploader] HEIC files detected:', heicNames);
+    // 各ファイルを検証
+    for (const file of files) {
+      const validation = await validateImageFile(file);
+      if (validation.valid) {
+        validFiles.push(file);
+      } else {
+        newWarnings.push(`${file.name}: ${validation.error}`);
+      }
     }
 
-    // 画像ファイルのみをフィルタ（HEIC除外）
-    const imageFiles = files.filter(file =>
-      file.type.startsWith('image/') &&
-      file.type !== 'image/heic' &&
-      file.type !== 'image/heif' &&
-      !file.name.toLowerCase().endsWith('.heic') &&
-      !file.name.toLowerCase().endsWith('.heif')
-    );
+    console.log('[PhotoUploader] Valid image files:', validFiles.map(f => f.name).join(', '));
 
-    console.log('[PhotoUploader] Valid image files:', imageFiles.map(f => f.name).join(', '));
-
-    if (imageFiles.length === 0 && files.length > 0) {
+    if (validFiles.length === 0 && files.length > 0) {
       newWarnings.push('選択されたファイルは対応していません。JPEGまたはPNG形式の画像を選択してください。');
     }
 
     setWarnings(newWarnings);
-    setSelectedFiles(prev => [...prev, ...imageFiles]);
+    setSelectedFiles(prev => [...prev, ...validFiles]);
 
     // プレビュー生成
-    imageFiles.forEach(file => {
+    validFiles.forEach(file => {
       const reader = new FileReader();
       reader.onload = (e) => {
         setPreviews(prev => [...prev, e.target?.result as string]);
@@ -148,13 +178,13 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({ onUploadComplete, 
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-2xl">
+    <div className="bg-procreate-card rounded-lg shadow-lg p-6 w-full max-w-2xl">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold text-gray-800">{t('photoUploader.title')}</h2>
+        <h2 className="text-2xl font-bold text-white">{t('photoUploader.title')}</h2>
         {onClose && (
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-procreate-hover rounded-lg transition-colors text-white"
           >
             <X size={24} />
           </button>
@@ -163,17 +193,17 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({ onUploadComplete, 
 
       {/* フォルダ選択 */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-white mb-2">
           {t('photoUploader.selectFolder')}
         </label>
         <select
           value={selectedFolderId || ''}
           onChange={(e) => setSelectedFolderId(e.target.value || null)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          className="w-full px-4 py-2 bg-procreate-bg text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-procreate-accent focus:border-transparent"
         >
-          <option value="">{t('photoManager.folders.allPhotos')}</option>
+          <option className="bg-white text-gray-900" value="">{t('photoManager.folders.allPhotos')}</option>
           {folders.map(folder => (
-            <option key={folder.id} value={folder.id}>
+            <option className="bg-white text-gray-900" key={folder.id} value={folder.id}>
               {folder.name}
             </option>
           ))}
@@ -184,14 +214,14 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({ onUploadComplete, 
       <div
         onDrop={handleDrop}
         onDragOver={handleDragOver}
-        className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-indigo-500 transition-colors cursor-pointer"
+        className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center bg-procreate-bg hover:border-procreate-accent transition-colors cursor-pointer"
         onClick={() => fileInputRef.current?.click()}
       >
-        <Upload size={48} className="mx-auto mb-4 text-gray-400" />
-        <p className="text-gray-600 mb-2">
+        <Upload size={48} className="mx-auto mb-4 text-gray-300" />
+        <p className="text-white mb-2">
           クリックして写真を選択、またはドラッグ&ドロップ
         </p>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-300">
           JPG, PNG, WEBP対応 / 複数選択可能
         </p>
       </div>
@@ -207,14 +237,14 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({ onUploadComplete, 
 
       {/* 警告メッセージ */}
       {warnings.length > 0 && (
-        <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <p className="text-yellow-800 font-semibold mb-2">⚠️ 警告</p>
-          <ul className="list-disc list-inside text-sm text-yellow-700 space-y-1">
+        <div className="mt-4 bg-procreate-tag border border-yellow-600 rounded-lg p-4">
+          <p className="text-yellow-400 font-semibold mb-2">⚠️ 警告</p>
+          <ul className="list-disc list-inside text-sm text-yellow-300 space-y-1">
             {warnings.map((warning, index) => (
               <li key={index}>{warning}</li>
             ))}
           </ul>
-          <p className="text-xs text-yellow-600 mt-2">
+          <p className="text-xs text-yellow-300 mt-2">
             💡 iPhoneで撮影した写真はHEIC形式の場合があります。設定アプリから「カメラ」→「フォーマット」→「互換性優先」に変更すると、JPEG形式で保存されます。
           </p>
         </div>
@@ -223,7 +253,7 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({ onUploadComplete, 
       {/* プレビュー */}
       {previews.length > 0 && (
         <div className="mt-6">
-          <h3 className="text-lg font-semibold mb-3">
+          <h3 className="text-lg font-semibold text-white mb-3">
             選択された写真 ({selectedFiles.length})
           </h3>
           <div className="grid grid-cols-3 gap-4 max-h-96 overflow-y-auto">
@@ -257,13 +287,13 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({ onUploadComplete, 
         <div className="mt-6">
           {uploading && (
             <div className="mb-4">
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-procreate-bg rounded-full h-2">
                 <div
-                  className="bg-indigo-600 h-2 rounded-full transition-all"
+                  className="bg-procreate-accent h-2 rounded-full transition-all"
                   style={{ width: `${progress}%` }}
                 />
               </div>
-              <p className="text-sm text-gray-600 mt-2 text-center">
+              <p className="text-sm text-gray-300 mt-2 text-center">
                 アップロード中... {Math.round(progress)}%
               </p>
             </div>
@@ -271,7 +301,7 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({ onUploadComplete, 
           <button
             onClick={handleUpload}
             disabled={uploading}
-            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-semibold"
+            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-procreate-accent text-white rounded-xl hover:bg-blue-600 hover:scale-[0.98] active:scale-[0.98] disabled:bg-gray-500 disabled:cursor-not-allowed transition-all font-semibold"
           >
             <Upload size={20} />
             {uploading ? 'アップロード中...' : `${selectedFiles.length}枚の写真をアップロード`}

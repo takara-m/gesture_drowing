@@ -1,10 +1,10 @@
-# CLAUDE.md
+# CLAUDE.md - Gesdro!
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
 
-A progressive face gesture drawing learning tool with 2 learning steps. Users trace and draw faces with increasing difficulty, from tracing over photos to independent drawing.
+**Gesdro!** is a progressive face gesture drawing learning tool with 2 learning steps. Users trace and draw faces with increasing difficulty, from tracing over photos to independent drawing.
 
 ## Development Commands
 

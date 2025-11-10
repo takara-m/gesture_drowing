@@ -25,6 +25,7 @@
     },
     "folders": {
       "title": "Folders",
+      "description": "Create folders like 'Hands', 'Cats', 'Poses' to enable folder-specific practice",
       "allPhotos": "All Photos",
       "createFolder": "New Folder",
       "folderName": "Folder Name",
@@ -87,7 +88,8 @@
     "invalidFileType": "Unsupported file type: {{files}}"
   },
   "drawingTool": {
-    "title": "Face Gesture Drawing Learning Tool",
+    "title": "Gesdro!",
+    "subtitle": "Face Gesture Drawing Learning Tool",
     "backToPhotos": "Back to Photo List",
     "currentStep": "Step {{step}}: {{description}}",
     "steps": {

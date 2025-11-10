@@ -3,6 +3,9 @@ import { Download, Upload, Undo2, Redo2, Eraser, Pencil, Minus, Circle, RefreshC
 import type { Photo } from '../services/db';
 import { getRandomPhoto, getRandomPhotoExcept, getPhotoByOrder } from '../services/photoService';
 import { useLanguage } from '../contexts/LanguageContext';
+import { AnimatedLogo } from './AnimatedLogo';
+import { AdBanner } from './ads';
+import { useAdSenseContext } from '../contexts/AdSenseContext';
 
 interface FaceGestureDrawingToolProps {
   selectedPhoto?: Photo | null;
@@ -12,11 +15,13 @@ interface FaceGestureDrawingToolProps {
 
 const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selectedPhoto, practiceFolderId = null, onBackToPhotos }) => {
   const { t } = useLanguage();
+  const { triggerInterstitial } = useAdSenseContext();
   const [currentStep, setCurrentStep] = useState(1);
   const [currentPhoto, setCurrentPhoto] = useState<Photo | null>(selectedPhoto || null);
   const [photoUrl, setPhotoUrl] = useState<string>('');
   const [brushSize, setBrushSize] = useState(3);
   const [brushColor, setBrushColor] = useState('#000000');
+  const [photoChangeCount, setPhotoChangeCount] = useState(0); // 写真切り替え回数カウンター
   const [isEraser, setIsEraser] = useState(false);
   const [drawingMode, setDrawingMode] = useState<'pen' | 'line' | 'ellipse'>('pen');
   const [showOverlay, setShowOverlay] = useState(false);
@@ -33,6 +38,10 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
   const [context, setContext] = useState(null);
   const [history, setHistory] = useState([]);
   const [historyStep, setHistoryStep] = useState(-1);
+
+  // イベントリスナー関数のRef（クリーンアップ用）
+  const drawFuncRef = useRef<any>(null);
+  const stopDrawingFuncRef = useRef<any>(null);
 
   // 写真URLの生成と画像サイズの取得（iOS Safari対応: Data URL形式で保存済み）
   useEffect(() => {
@@ -96,6 +105,37 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
       setContext(ctx);
       saveToHistory(ctx);
     }
+
+    // クリーンアップ: コンポーネントアンマウント時にイベントリスナーを削除
+    return () => {
+      console.log('[FaceGestureDrawingTool] Cleaning up event listeners on unmount');
+
+      // 描画中の場合、イベントリスナーを強制削除（メモリリーク防止）
+      if (isDrawingRef.current) {
+        console.warn('[FaceGestureDrawingTool] Drawing was in progress during unmount, forcing event listener cleanup');
+
+        // Refから関数を取得してイベントリスナーを削除
+        const drawFunc = drawFuncRef.current;
+        const stopDrawingFunc = stopDrawingFuncRef.current;
+
+        if (drawFunc && stopDrawingFunc) {
+          document.removeEventListener('mousemove', drawFunc);
+          document.removeEventListener('mouseup', stopDrawingFunc);
+          document.removeEventListener('touchmove', drawFunc);
+          document.removeEventListener('touchend', stopDrawingFunc);
+        }
+
+        isDrawingRef.current = false;
+      }
+    };
+  }, []);
+
+  // 写真一覧に戻るときにカウンターをリセット（アンマウント時）
+  useEffect(() => {
+    return () => {
+      console.log('[FaceGestureDrawingTool] Component unmounting, resetting photo change count');
+      setPhotoChangeCount(0);
+    };
   }, []);
 
   // 写真が変更されたときにキャンバスと履歴をリセット
@@ -256,6 +296,10 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
     }
   };
 
+  // イベントリスナー関数をRefに保存（クリーンアップで使用）
+  drawFuncRef.current = draw;
+  stopDrawingFuncRef.current = stopDrawing;
+
   const clearCanvas = () => {
     if (context) {
       context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
@@ -333,6 +377,8 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
   const changePhoto = async () => {
     console.log('[changePhoto] Button clicked, practiceFolderId:', practiceFolderId);
 
+    let photoChanged = false;
+
     if (!currentPhoto || !currentPhoto.id) {
       console.warn('[changePhoto] No current photo, using getPhotoByOrder with folder:', practiceFolderId);
       const photo = await getPhotoByOrder('random', practiceFolderId);
@@ -341,48 +387,65 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
         setCurrentPhoto(photo);
         clearCanvas();
         setShowOverlay(false);
+        photoChanged = true;
       } else {
         console.error('[changePhoto] No photos available in folder:', practiceFolderId);
       }
-      return;
+    } else {
+      // 現在の写真を除外して別の写真を取得（フォルダフィルタリング対応）
+      console.log(`[changePhoto] Current photo ID: ${currentPhoto.id}, folder: ${practiceFolderId}, getting different photo...`);
+      const photo = await getRandomPhotoExcept(currentPhoto.id, practiceFolderId);
+
+      if (photo) {
+        console.log(`[changePhoto] Successfully changed to photo: ${photo.id}`);
+        setCurrentPhoto(photo);
+        clearCanvas();
+        setShowOverlay(false);
+        photoChanged = true;
+      } else {
+        console.warn('[changePhoto] No other photos available in folder:', practiceFolderId);
+        // 写真が1枚しかない場合でもエラーは表示せず、何もしない
+      }
     }
 
-    // 現在の写真を除外して別の写真を取得（フォルダフィルタリング対応）
-    console.log(`[changePhoto] Current photo ID: ${currentPhoto.id}, folder: ${practiceFolderId}, getting different photo...`);
-    const photo = await getRandomPhotoExcept(currentPhoto.id, practiceFolderId);
+    // 写真が正常に変更された場合、カウンターをインクリメント
+    if (photoChanged) {
+      const newCount = photoChangeCount + 1;
+      setPhotoChangeCount(newCount);
+      console.log(`[changePhoto] Photo change count: ${newCount}/20`);
 
-    if (photo) {
-      console.log(`[changePhoto] Successfully changed to photo: ${photo.id}`);
-      setCurrentPhoto(photo);
-      clearCanvas();
-      setShowOverlay(false);
-    } else {
-      console.warn('[changePhoto] No other photos available in folder:', practiceFolderId);
-      // 写真が1枚しかない場合でもエラーは表示せず、何もしない
+      // 20回に達したらインタースティシャル広告を表示してリセット
+      if (newCount >= 20) {
+        console.log('[changePhoto] 20 photo changes reached, showing interstitial ad');
+        triggerInterstitial();
+        setPhotoChangeCount(0);
+      }
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
+    <div className="min-h-screen bg-procreate-bg p-6">
+      {/* ロゴセクション（最上部・中央寄せ・レスポンシブ） */}
+      <div className="flex justify-center mb-6">
+        <AnimatedLogo compact />
+      </div>
+
       <div className="max-w-7xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
+        <div className="bg-procreate-card rounded-lg p-8">
           {/* ヘッダー */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
-              <h1 className="text-3xl font-bold text-gray-800">
-                顔ジェスチャードローイング学習ツール
-              </h1>
               {onBackToPhotos && (
                 <button
                   onClick={onBackToPhotos}
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-procreate-tag text-white rounded-xl hover:bg-procreate-hover transition-colors"
                 >
                   <ArrowLeft size={20} />
-                  写真一覧に戻る
+                  {t('drawingTool.backToPhotos')}
                 </button>
               )}
             </div>
-            <p className="text-gray-600">
+            <p className="text-white text-lg">
               Step {currentStep}: {stepDescriptions[currentStep]}
             </p>
           </div>
@@ -393,10 +456,10 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
               <button
                 key={step}
                 onClick={() => setCurrentStep(step)}
-                className={`px-6 py-3 rounded-lg font-semibold transition-all ${
+                className={`px-6 py-3 rounded-xl font-semibold transition-all hover:scale-[0.98] active:scale-[0.98] ${
                   currentStep === step
-                    ? 'bg-indigo-600 text-white shadow-lg'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    ? 'bg-procreate-accent text-white shadow-lg'
+                    : 'bg-procreate-tag text-white hover:bg-procreate-hover'
                 }`}
               >
                 Step {step}
@@ -408,7 +471,7 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
           <div className="mb-6">
             <button
               onClick={changePhoto}
-              className="flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              className="flex items-center gap-2 px-6 py-3 bg-procreate-tag text-white rounded-xl hover:bg-procreate-hover hover:scale-[0.98] active:scale-[0.98] transition-all"
             >
               <RefreshCw size={20} />
               写真切替
@@ -419,8 +482,8 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-6 items-start">
             {/* 左側: 参考写真 */}
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold text-gray-800">参考写真</h2>
-              <div className="relative border-4 border-gray-300 rounded-lg overflow-hidden bg-white">
+              <h2 className="text-xl font-semibold text-white">参考写真</h2>
+              <div className="relative border border-gray-600 overflow-hidden bg-procreate-bg rounded-lg">
                 {photoUrl ? (
                   <img
                     src={photoUrl}
@@ -481,8 +544,8 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
 
             {/* 右側: 描画スペース */}
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold text-gray-800">描画スペース</h2>
-              <div className="relative border-4 border-indigo-300 rounded-lg overflow-hidden bg-white">
+              <h2 className="text-xl font-semibold text-white">描画スペース</h2>
+              <div className="relative border border-gray-600 overflow-hidden bg-white rounded-lg">
                 {/* Step1: 背景に参考写真を表示 */}
                 {currentStep === 1 && photoUrl && (
                   <img
@@ -557,12 +620,12 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
               </div>
 
               {/* 透明度・答え合わせコントロール（描画スペース直下） */}
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-procreate-tag rounded-lg p-4">
                 {/* Step1: 参考写真の透明度調整 */}
                 {currentStep === 1 && (
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
-                      <label className="text-sm font-semibold text-gray-700">参考写真の透明度:</label>
+                      <label className="text-sm font-semibold text-white">参考写真の透明度:</label>
                       <input
                         type="range"
                         min="0"
@@ -572,9 +635,9 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
                         onChange={(e) => setOverlayOpacity(Number(e.target.value))}
                         className="w-32"
                       />
-                      <span className="text-sm text-gray-600">{Math.round(overlayOpacity * 100)}%</span>
+                      <span className="text-sm text-gray-300">{Math.round(overlayOpacity * 100)}%</span>
                     </div>
-                    <p className="text-xs text-gray-500">💡 参考写真の上に描画しています。透明度を調整してトレースしやすい濃さに設定してください。</p>
+                    <p className="text-xs text-gray-400">💡 参考写真の上に描画しています。透明度を調整してトレースしやすい濃さに設定してください。</p>
                   </div>
                 )}
 
@@ -584,10 +647,10 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => setShowOverlay(!showOverlay)}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all hover:scale-[0.98] active:scale-[0.98] ${
                           showOverlay
-                            ? 'bg-green-500 text-white'
-                            : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+                            ? 'bg-procreate-accent text-white'
+                            : 'bg-procreate-bg text-white hover:bg-procreate-hover'
                         }`}
                       >
                         {showOverlay ? <Eye size={18} /> : <EyeOff size={18} />}
@@ -595,7 +658,7 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
                       </button>
                       {showOverlay && (
                         <div className="flex items-center gap-3">
-                          <label className="text-sm font-semibold text-gray-700">透明度:</label>
+                          <label className="text-sm font-semibold text-white">透明度:</label>
                           <input
                             type="range"
                             min="0"
@@ -605,7 +668,7 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
                             onChange={(e) => setOverlayOpacity(Number(e.target.value))}
                             className="w-32"
                           />
-                          <span className="text-sm text-gray-600">{Math.round(overlayOpacity * 100)}%</span>
+                          <span className="text-sm text-gray-300">{Math.round(overlayOpacity * 100)}%</span>
                         </div>
                       )}
                     </div>
@@ -616,13 +679,13 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
           </div>
 
           {/* ツールバー */}
-          <div className="bg-gray-50 rounded-xl p-6 space-y-4">
+          <div className="bg-procreate-tag rounded-lg p-6 space-y-4">
             {/* 描画ツール */}
             <div className="flex flex-wrap gap-4 items-center">
               <button
                 onClick={undo}
                 disabled={historyStep <= 0}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-procreate-bg text-white rounded-xl hover:bg-procreate-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:scale-[0.98] active:scale-[0.98]"
               >
                 <Undo2 size={18} />
                 {t('drawingTool.toolbar.undo')}
@@ -630,7 +693,7 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
               <button
                 onClick={redo}
                 disabled={historyStep >= history.length - 1}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-procreate-bg text-white rounded-xl hover:bg-procreate-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:scale-[0.98] active:scale-[0.98]"
               >
                 <Redo2 size={18} />
                 {t('drawingTool.toolbar.redo')}
@@ -640,10 +703,10 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
                   setDrawingMode('pen');
                   setIsEraser(false);
                 }}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all hover:scale-[0.98] active:scale-[0.98] ${
                   drawingMode === 'pen' && !isEraser
-                    ? 'bg-blue-500 text-white shadow-md'
-                    : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+                    ? 'bg-procreate-accent text-white shadow-md'
+                    : 'bg-procreate-bg text-white hover:bg-procreate-hover'
                 }`}
               >
                 <Pencil size={18} />
@@ -654,10 +717,10 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
                   setDrawingMode('line');
                   setIsEraser(false);
                 }}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all hover:scale-[0.98] active:scale-[0.98] ${
                   drawingMode === 'line' && !isEraser
-                    ? 'bg-blue-500 text-white shadow-md'
-                    : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+                    ? 'bg-procreate-accent text-white shadow-md'
+                    : 'bg-procreate-bg text-white hover:bg-procreate-hover'
                 }`}
               >
                 <Minus size={18} />
@@ -668,10 +731,10 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
                   setDrawingMode('ellipse');
                   setIsEraser(false);
                 }}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all hover:scale-[0.98] active:scale-[0.98] ${
                   drawingMode === 'ellipse' && !isEraser
-                    ? 'bg-blue-500 text-white shadow-md'
-                    : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+                    ? 'bg-procreate-accent text-white shadow-md'
+                    : 'bg-procreate-bg text-white hover:bg-procreate-hover'
                 }`}
               >
                 <Circle size={18} />
@@ -682,10 +745,10 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
                   setDrawingMode('pen');
                   setIsEraser(true);
                 }}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all hover:scale-[0.98] active:scale-[0.98] ${
                   isEraser
-                    ? 'bg-orange-500 text-white shadow-md'
-                    : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+                    ? 'bg-red-600 text-white shadow-md'
+                    : 'bg-procreate-bg text-white hover:bg-procreate-hover'
                 }`}
               >
                 <Eraser size={18} />
@@ -693,10 +756,10 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
               </button>
               <button
                 onClick={() => setShowGrid(!showGrid)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all hover:scale-[0.98] active:scale-[0.98] ${
                   showGrid
-                    ? 'bg-indigo-500 text-white shadow-md'
-                    : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+                    ? 'bg-procreate-accent text-white shadow-md'
+                    : 'bg-procreate-bg text-white hover:bg-procreate-hover'
                 }`}
               >
                 <Grid size={18} />
@@ -704,7 +767,7 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
               </button>
               <button
                 onClick={clearCanvas}
-                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                className="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 hover:scale-[0.98] active:scale-[0.98] transition-all"
               >
                 {t('drawingTool.toolbar.clearAll')}
               </button>
@@ -712,10 +775,10 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
 
             {/* グリッド調整（グリッド表示中のみ） */}
             {showGrid && (
-              <div className="flex flex-wrap items-center gap-6 bg-indigo-50 rounded-lg p-3">
+              <div className="flex flex-wrap items-center gap-6 bg-procreate-bg rounded-lg p-3">
                 {/* グリッドサイズ */}
                 <div className="flex items-center gap-3">
-                  <label className="text-sm font-semibold text-gray-700">{t('drawingTool.toolbar.gridSize')}</label>
+                  <label className="text-sm font-semibold text-white">{t('drawingTool.toolbar.gridSize')}</label>
                   <input
                     type="range"
                     min="2"
@@ -724,12 +787,12 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
                     onChange={(e) => setGridSize(Number(e.target.value))}
                     className="w-32"
                   />
-                  <span className="text-sm text-gray-600 font-medium w-10">{gridSize}x{gridSize}</span>
+                  <span className="text-sm text-gray-300 font-medium w-10">{gridSize}x{gridSize}</span>
                 </div>
 
                 {/* グリッドの濃さ */}
                 <div className="flex items-center gap-3">
-                  <label className="text-sm font-semibold text-gray-700">{t('drawingTool.toolbar.gridOpacity')}</label>
+                  <label className="text-sm font-semibold text-white">{t('drawingTool.toolbar.gridOpacity')}</label>
                   <input
                     type="range"
                     min="0.1"
@@ -739,7 +802,7 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
                     onChange={(e) => setGridOpacity(Number(e.target.value))}
                     className="w-32"
                   />
-                  <span className="text-sm text-gray-600 font-medium w-10">{Math.round(gridOpacity * 100)}%</span>
+                  <span className="text-sm text-gray-300 font-medium w-10">{Math.round(gridOpacity * 100)}%</span>
                 </div>
               </div>
             )}
@@ -747,7 +810,7 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
             {/* ブラシ設定 */}
             <div className="flex flex-wrap gap-6 items-center">
               <div className="flex items-center gap-3">
-                <label className="text-sm font-semibold text-gray-700">色:</label>
+                <label className="text-sm font-semibold text-white">色:</label>
                 <input
                   type="color"
                   value={brushColor}
@@ -756,7 +819,7 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
                 />
               </div>
               <div className="flex items-center gap-3">
-                <label className="text-sm font-semibold text-gray-700">サイズ:</label>
+                <label className="text-sm font-semibold text-white">サイズ:</label>
                 <input
                   type="range"
                   min="1"
@@ -765,15 +828,15 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
                   onChange={(e) => setBrushSize(Number(e.target.value))}
                   className="w-32"
                 />
-                <span className="text-sm text-gray-600 w-8">{brushSize}</span>
+                <span className="text-sm text-gray-300 w-8">{brushSize}</span>
               </div>
             </div>
 
             {/* 保存・読み込み */}
-            <div className="border-t pt-4 flex gap-3">
+            <div className="border-t border-gray-600 pt-4 flex gap-3">
               <button
                 onClick={downloadDrawing}
-                className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold"
+                className="flex items-center gap-2 px-6 py-3 bg-procreate-accent text-white rounded-xl hover:bg-blue-600 hover:scale-[0.98] active:scale-[0.98] transition-all font-semibold"
               >
                 <Download size={18} />
                 画像をダウンロード
@@ -781,6 +844,16 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
             </div>
           </div>
         </div>
+
+        {/* バナー広告（練習画面最下部） */}
+        <AdBanner slot="1234567890" format="auto" responsive={true} />
+
+        {/* フッター（コピーライト表記） */}
+        <footer className="mt-12 pb-6 text-center">
+          <p className="text-sm text-gray-400">
+            © 2025 あんにゅい. All rights reserved.
+          </p>
+        </footer>
       </div>
     </div>
   );

@@ -1,6 +1,39 @@
 import { db } from './db';
 import type { Photo } from './db';
 import { v4 as uuidv4 } from 'uuid';
+import { z } from 'zod';
+
+// ===== セキュリティ制限 =====
+const MAX_PHOTOS = 100; // 最大保存可能写真数
+const MAX_BACKUP_SIZE = 50 * 1024 * 1024; // 50MB（バックアップJSONファイルの最大サイズ）
+const MAX_DATA_URL_SIZE = 5 * 1024 * 1024; // 5MB（単一Data URLの最大サイズ）
+
+// ===== バックアップJSON検証スキーマ (Zod) =====
+const PhotoSchema = z.object({
+  id: z.string().uuid(),
+  folderId: z.string().uuid().nullable(),
+  filename: z.string().min(1).max(255),
+  dataUrl: z.string().refine(
+    (val) => val.startsWith('data:image/') && val.length < MAX_DATA_URL_SIZE,
+    { message: 'Invalid or too large data URL' }
+  ),
+  thumbnailUrl: z.string().refine(
+    (val) => val.startsWith('data:image/') && val.length < MAX_DATA_URL_SIZE,
+    { message: 'Invalid or too large thumbnail URL' }
+  ),
+  width: z.number().int().positive().max(10000),
+  height: z.number().int().positive().max(10000),
+  fileSize: z.number().int().positive().max(50 * 1024 * 1024), // 50MB max
+  addedAt: z.union([z.date(), z.string().datetime()]),
+  tags: z.array(z.string()).optional()
+});
+
+const BackupSchema = z.object({
+  version: z.string(),
+  exportDate: z.string().datetime(),
+  totalPhotos: z.number().int().nonnegative(),
+  photos: z.array(PhotoSchema).max(MAX_PHOTOS)
+});
 
 // 画像をリサイズしてData URLを生成（iOS Safari対応: Blob → Data URL）
 export const resizeImage = (
@@ -62,9 +95,21 @@ export const resizeImage = (
       try {
         const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
         console.log(`[resizeImage] Data URL created successfully, length: ${dataUrl.length}`);
+
+        // メモリクリーンアップ: canvasをクリア
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        canvas.width = 0;
+        canvas.height = 0;
+
         resolve(dataUrl);
       } catch (error) {
         console.error('[resizeImage] Failed to create data URL from canvas:', error);
+
+        // エラー時もcanvasをクリーンアップ
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        canvas.width = 0;
+        canvas.height = 0;
+
         reject(new Error('Failed to create data URL'));
       }
     };
@@ -92,6 +137,12 @@ export const createThumbnail = (file: File): Promise<string> => {
 export const addPhoto = async (file: File, folderId: string | null = null): Promise<string> => {
   try {
     console.log(`[addPhoto] Starting upload: ${file.name}, type: ${file.type}, size: ${file.size}, folderId: ${folderId}`);
+
+    // 写真数制限チェック（セキュリティ: メモリ保護）
+    const existingPhotos = await getAllPhotos();
+    if (existingPhotos.length >= MAX_PHOTOS) {
+      throw new Error(`写真は最大${MAX_PHOTOS}枚まで保存できます。古い写真を削除してください。`);
+    }
 
     // HEIC形式の警告（iOSで一般的だが、ブラウザのサポートが限定的）
     if (file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic')) {
@@ -294,14 +345,45 @@ export const importPhotosFromJSON = async (jsonString: string): Promise<{ import
   try {
     console.log('[importPhotosFromJSON] Starting import...');
 
-    // JSONパース
-    const backup: PhotoBackup = JSON.parse(jsonString);
+    // 1. ファイルサイズチェック（セキュリティ: メモリ保護）
+    const backupSize = new Blob([jsonString]).size;
+    console.log(`[importPhotosFromJSON] Backup file size: ${backupSize} bytes (${(backupSize / 1024 / 1024).toFixed(2)} MB)`);
+
+    if (backupSize > MAX_BACKUP_SIZE) {
+      throw new Error(`バックアップファイルが大きすぎます（最大${MAX_BACKUP_SIZE / 1024 / 1024}MB）`);
+    }
+
+    // 2. JSONパース
+    let parsedData: any;
+    try {
+      parsedData = JSON.parse(jsonString);
+    } catch (parseError) {
+      console.error('[importPhotosFromJSON] JSON parse error:', parseError);
+      throw new Error('無効なJSON形式です');
+    }
+
+    // 3. Zodスキーマ検証（セキュリティ: データ検証）
+    const validationResult = BackupSchema.safeParse(parsedData);
+    if (!validationResult.success) {
+      console.error('[importPhotosFromJSON] Schema validation failed:', validationResult.error);
+      throw new Error('バックアップファイルの形式が無効です: ' + validationResult.error.errors[0].message);
+    }
+
+    const backup: PhotoBackup = validationResult.data as PhotoBackup;
     console.log(`[importPhotosFromJSON] Backup version: ${backup.version}, Total photos in backup: ${backup.totalPhotos}`);
 
     // 既存の写真IDを取得
     const existingPhotos = await getAllPhotos();
     const existingIds = new Set(existingPhotos.map(p => p.id));
     console.log(`[importPhotosFromJSON] Existing photos: ${existingIds.size}`);
+
+    // 4. インポート後の合計写真数チェック（セキュリティ: メモリ保護）
+    const newPhotos = backup.photos.filter(p => !existingIds.has(p.id));
+    const totalAfterImport = existingPhotos.length + newPhotos.length;
+
+    if (totalAfterImport > MAX_PHOTOS) {
+      throw new Error(`インポート後の合計写真数が${MAX_PHOTOS}枚を超えます（現在: ${existingPhotos.length}枚、新規: ${newPhotos.length}枚）`);
+    }
 
     let imported = 0;
     let skipped = 0;
