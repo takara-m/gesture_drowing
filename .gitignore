@@ -27,3 +27,7 @@ yarn-error.log*
 # OS files
 .DS_Store
 Thumbs.db
+
+# Reference photos and notes (local only)
+参考写真/
+要望.txt
