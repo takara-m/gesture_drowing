@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Upload, Camera, X } from 'lucide-react';
+import { Upload, X } from 'lucide-react';
 import { addPhoto } from '../services/photoService';
 import { getAllFolders } from '../services/folderService';
 import type { Folder } from '../services/db';

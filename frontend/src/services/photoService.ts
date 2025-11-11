@@ -366,7 +366,8 @@ export const importPhotosFromJSON = async (jsonString: string): Promise<{ import
     const validationResult = BackupSchema.safeParse(parsedData);
     if (!validationResult.success) {
       console.error('[importPhotosFromJSON] Schema validation failed:', validationResult.error);
-      throw new Error('バックアップファイルの形式が無効です: ' + validationResult.error.errors[0].message);
+      const firstError = validationResult.error.issues[0];
+      throw new Error('バックアップファイルの形式が無効です: ' + (firstError?.message || '不明なエラー'));
     }
 
     const backup: PhotoBackup = validationResult.data as PhotoBackup;

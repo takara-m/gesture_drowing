@@ -11,7 +11,7 @@ interface PhotoGridProps {
   onPhotosChange?: () => void;
 }
 
-export const PhotoGrid: React.FC<PhotoGridProps> = ({ selectedFolderId = null, onPhotoSelect, onPhotosChange }) => {
+export const PhotoGrid: React.FC<PhotoGridProps> = ({ selectedFolderId = null, onPhotosChange }) => {
   const { t } = useLanguage();
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [thumbnailUrls, setThumbnailUrls] = useState<Map<string, string>>(new Map());

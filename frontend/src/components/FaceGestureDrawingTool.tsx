@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Download, Upload, Undo2, Redo2, Eraser, Pencil, Minus, Circle, RefreshCw, Eye, EyeOff, ArrowLeft, Image as ImageIcon, Grid } from 'lucide-react';
+import { Download, Undo2, Redo2, Eraser, Pencil, Minus, Circle, RefreshCw, Eye, EyeOff, ArrowLeft, Image as ImageIcon, Grid } from 'lucide-react';
 import type { Photo } from '../services/db';
-import { getRandomPhoto, getRandomPhotoExcept, getPhotoByOrder } from '../services/photoService';
+import { getRandomPhotoExcept, getPhotoByOrder } from '../services/photoService';
 import { useLanguage } from '../contexts/LanguageContext';
 import { AnimatedLogo } from './AnimatedLogo';
 import { AdBanner } from './ads';
@@ -31,12 +31,11 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
   const [overlayOpacity, setOverlayOpacity] = useState(0.3);
   const [imageDimensions, setImageDimensions] = useState({ width: 400, height: 500 });
 
-  const canvasRef = useRef(null);
-  const [isDrawing, setIsDrawing] = useState(false);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const isDrawingRef = useRef(false);
   const startPointRef = useRef<{ x: number; y: number } | null>(null);
-  const [context, setContext] = useState(null);
-  const [history, setHistory] = useState([]);
+  const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
+  const [history, setHistory] = useState<ImageData[]>([]);
   const [historyStep, setHistoryStep] = useState(-1);
 
   // イベントリスナー関数のRef（クリーンアップ用）
@@ -100,10 +99,12 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
     const canvas = canvasRef.current;
     if (canvas) {
       const ctx = canvas.getContext('2d');
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      setContext(ctx);
-      saveToHistory(ctx);
+      if (ctx) {
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        setContext(ctx);
+        saveToHistory(ctx);
+      }
     }
 
     // クリーンアップ: コンポーネントアンマウント時にイベントリスナーを削除
@@ -150,8 +151,9 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
     }
   }, [imageDimensions, context]);
 
-  const saveToHistory = (ctx) => {
+  const saveToHistory = (ctx: CanvasRenderingContext2D) => {
     const canvas = canvasRef.current;
+    if (!canvas) return;
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const newHistory = history.slice(0, historyStep + 1);
     newHistory.push(imageData);
@@ -160,7 +162,7 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
   };
 
   // 座標取得の統一関数（マウス・タッチ両対応）
-  const getCoordinates = (e) => {
+  const getCoordinates = (e: any) => {
     const canvas = canvasRef.current;
     if (!canvas) return { x: 0, y: 0 };
 
@@ -184,7 +186,7 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
     };
   };
 
-  const startDrawing = (e) => {
+  const startDrawing = (e: any) => {
     if (!context) return;
 
     // タッチイベントの場合はスクロールを防止
@@ -192,7 +194,6 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
       e.preventDefault();
     }
 
-    setIsDrawing(true);
     isDrawingRef.current = true;
     const { x, y } = getCoordinates(e);
 
@@ -215,7 +216,7 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
     }
   };
 
-  const draw = (e) => {
+  const draw = (e: any) => {
     if (!isDrawingRef.current || !context) return;
 
     // タッチイベントの場合はスクロールを防止
@@ -275,7 +276,6 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
 
   const stopDrawing = () => {
     if (isDrawingRef.current && context) {
-      setIsDrawing(false);
       isDrawingRef.current = false;
 
       if (drawingMode === 'pen') {
@@ -301,14 +301,14 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
   stopDrawingFuncRef.current = stopDrawing;
 
   const clearCanvas = () => {
-    if (context) {
+    if (context && canvasRef.current) {
       context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
       saveToHistory(context);
     }
   };
 
   const undo = () => {
-    if (historyStep > 0) {
+    if (context && historyStep > 0) {
       const newStep = historyStep - 1;
       setHistoryStep(newStep);
       context.putImageData(history[newStep], 0, 0);
@@ -316,7 +316,7 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
   };
 
   const redo = () => {
-    if (historyStep < history.length - 1) {
+    if (context && historyStep < history.length - 1) {
       const newStep = historyStep + 1;
       setHistoryStep(newStep);
       context.putImageData(history[newStep], 0, 0);
@@ -446,7 +446,7 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
               )}
             </div>
             <p className="text-white text-lg">
-              Step {currentStep}: {stepDescriptions[currentStep]}
+              Step {currentStep}: {stepDescriptions[currentStep as keyof typeof stepDescriptions]}
             </p>
           </div>
 
