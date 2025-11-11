@@ -159,6 +159,18 @@
       "q6": {
         "question": "Can I use this on iPad/tablet?",
         "answer": "Yes, you can use this on iPad/tablet.\n\n【How to Use】\n1. Open Safari or Chrome on your iPad\n2. Access this app's URL\n3. Draw with your finger or Apple Pencil\n\n【Touch Controls】\n• Tap the canvas directly to draw\n• Pinch to zoom (browser feature)\n• Scroll prevention keeps the page from moving while drawing\n\n【Local Network Use】\nRun the development server on PC to access from iPad on the same Wi-Fi network."
+      },
+      "q7": {
+        "question": "Do you collect personal information?",
+        "answer": "No, we do not collect any personal information.\n\n【Data Storage Location】\n• All data is stored in your browser (IndexedDB)\n• Nothing is sent to our servers\n• Works completely offline\n\n【Data Stored】\n• Uploaded photos\n• Drawing data\n• Folder settings\n• Language settings\n\nAll of this data is stored only on your device and is never transmitted externally."
+      },
+      "q8": {
+        "question": "About Cookies and Advertising",
+        "answer": "This app uses Google AdSense to display advertisements.\n\n【Cookie Usage】\nGoogle AdSense uses cookies for:\n• Displaying personalized ads\n• Measuring ad effectiveness\n• Remembering user ad preferences\n\n【Privacy Settings】\nYou can disable personalized ads from Google's ad settings page:\nhttps://www.google.com/settings/ads\n\n【Third-Party Sharing】\n• This app does not share data with third parties\n• For data collected by Google AdSense, please refer to Google's Privacy Policy"
+      },
+      "q9": {
+        "question": "Terms of Use & Operator Information",
+        "answer": "【Terms of Use】\nThis app is provided \"as is\" without any warranties.\n\n• We are not responsible for data loss or deletion\n• Regular backups are recommended\n• App specifications may change without notice\n\n【Operator Information】\nOperator: Annyui\n\n【Disclaimer】\n• The operator assumes no liability for damages resulting from use of this app\n• Photos may be lost if browser data is deleted\n• Please use the backup feature"
       }
     }
   }
