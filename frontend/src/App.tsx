@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Globe, HelpCircle } from 'lucide-react'
+import { Globe, HelpCircle, Mail } from 'lucide-react'
 import FaceGestureDrawingTool from './components/FaceGestureDrawingTool'
+import ContactModal from './components/ContactModal'
 import { PhotoManager } from './pages/PhotoManager'
 import FAQ from './pages/FAQ'
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext'
@@ -16,6 +17,7 @@ function AppContent() {
   const [practiceFolderId, setPracticeFolderId] = useState<string | null>(null)
   const [previousView, setPreviousView] = useState<'drawing' | 'photos' | 'faq'>('photos')
   const [viewBeforeFAQ, setViewBeforeFAQ] = useState<'drawing' | 'photos'>('photos')
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false)
 
   // 広告管理用のContext
   const { showInterstitial, triggerInterstitial, closeInterstitial } = useAdSenseContext()
@@ -65,6 +67,15 @@ function AppContent() {
 
       {/* ヘッダーボタン（固定位置・レスポンシブ対応） */}
       <div className="fixed top-4 right-4 z-50 flex flex-col sm:flex-row gap-2">
+        {/* お問い合わせボタン */}
+        <button
+          onClick={() => setIsContactModalOpen(true)}
+          className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-procreate-card text-white rounded-xl hover:bg-procreate-hover shadow-lg transition-all hover:scale-[0.98] active:scale-[0.98] border border-gray-600"
+          title={t('contact.title')}
+        >
+          <Mail size={20} />
+        </button>
+
         {/* ヘルプボタン */}
         <button
           onClick={() => {
@@ -89,6 +100,9 @@ function AppContent() {
           <span className="hidden sm:inline font-semibold">{language === 'ja' ? '日本語' : 'English'}</span>
         </button>
       </div>
+
+      {/* Contact Modal */}
+      <ContactModal isOpen={isContactModalOpen} onClose={() => setIsContactModalOpen(false)} />
 
       {currentView === 'faq' ? (
         <FAQ onBack={() => setCurrentView(viewBeforeFAQ)} />

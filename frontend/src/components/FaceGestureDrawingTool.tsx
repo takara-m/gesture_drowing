@@ -90,11 +90,6 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
     }
   }, [selectedPhoto, practiceFolderId]);
 
-  const stepDescriptions = {
-    1: '顔写真の上に描画（トレースモード）',
-    2: '写真の隣に自力で描く'
-  };
-
   useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas) {
@@ -446,7 +441,7 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
               )}
             </div>
             <p className="text-white text-lg">
-              Step {currentStep}: {stepDescriptions[currentStep as keyof typeof stepDescriptions]}
+              Step {currentStep}: {t(`drawingTool.steps.${currentStep}`)}
             </p>
           </div>
 
@@ -474,7 +469,7 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
               className="flex items-center gap-2 px-6 py-3 bg-procreate-tag text-white rounded-xl hover:bg-procreate-hover hover:scale-[0.98] active:scale-[0.98] transition-all"
             >
               <RefreshCw size={20} />
-              写真切替
+              {t('drawingTool.changePhoto')}
             </button>
           </div>
 
@@ -482,7 +477,7 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-6 items-start">
             {/* 左側: 参考写真 */}
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold text-white">参考写真</h2>
+              <h2 className="text-xl font-semibold text-white">{t('drawingTool.referencePhoto')}</h2>
               <div className="relative border border-gray-600 overflow-hidden bg-procreate-bg rounded-lg">
                 {photoUrl ? (
                   <img
@@ -544,7 +539,7 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
 
             {/* 右側: 描画スペース */}
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold text-white">描画スペース</h2>
+              <h2 className="text-xl font-semibold text-white">{t('drawingTool.drawingSpace')}</h2>
               <div className="relative border border-gray-600 overflow-hidden bg-white rounded-lg">
                 {/* Step1: 背景に参考写真を表示 */}
                 {currentStep === 1 && photoUrl && (
@@ -625,7 +620,7 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
                 {currentStep === 1 && (
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
-                      <label className="text-sm font-semibold text-white">参考写真の透明度:</label>
+                      <label className="text-sm font-semibold text-white">{t('drawingTool.controls.opacity')}</label>
                       <input
                         type="range"
                         min="0"
@@ -637,7 +632,7 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
                       />
                       <span className="text-sm text-gray-300">{Math.round(overlayOpacity * 100)}%</span>
                     </div>
-                    <p className="text-xs text-gray-400">💡 参考写真の上に描画しています。透明度を調整してトレースしやすい濃さに設定してください。</p>
+                    <p className="text-xs text-gray-400">💡 {t('drawingTool.controls.opacityHint')}</p>
                   </div>
                 )}
 
@@ -654,11 +649,11 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
                         }`}
                       >
                         {showOverlay ? <Eye size={18} /> : <EyeOff size={18} />}
-                        答え合わせ表示
+                        {t('drawingTool.controls.answerCheck')}
                       </button>
                       {showOverlay && (
                         <div className="flex items-center gap-3">
-                          <label className="text-sm font-semibold text-white">透明度:</label>
+                          <label className="text-sm font-semibold text-white">{t('drawingTool.controls.transparency')}</label>
                           <input
                             type="range"
                             min="0"
@@ -810,7 +805,7 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
             {/* ブラシ設定 */}
             <div className="flex flex-wrap gap-6 items-center">
               <div className="flex items-center gap-3">
-                <label className="text-sm font-semibold text-white">色:</label>
+                <label className="text-sm font-semibold text-white">{t('drawingTool.toolbar.color')}</label>
                 <input
                   type="color"
                   value={brushColor}
@@ -819,7 +814,7 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
                 />
               </div>
               <div className="flex items-center gap-3">
-                <label className="text-sm font-semibold text-white">サイズ:</label>
+                <label className="text-sm font-semibold text-white">{t('drawingTool.toolbar.size')}</label>
                 <input
                   type="range"
                   min="1"
@@ -839,7 +834,7 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
                 className="flex items-center gap-2 px-6 py-3 bg-procreate-accent text-white rounded-xl hover:bg-blue-600 hover:scale-[0.98] active:scale-[0.98] transition-all font-semibold"
               >
                 <Download size={18} />
-                画像をダウンロード
+                {t('drawingTool.toolbar.download')}
               </button>
             </div>
           </div>

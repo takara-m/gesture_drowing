@@ -173,5 +173,34 @@
         "answer": "【Terms of Use】\nThis app is provided \"as is\" without any warranties.\n\n• We are not responsible for data loss or deletion\n• Regular backups are recommended\n• App specifications may change without notice\n\n【Operator Information】\nOperator: Annyui\n\n【Disclaimer】\n• The operator assumes no liability for damages resulting from use of this app\n• Photos may be lost if browser data is deleted\n• Please use the backup feature"
       }
     }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "description": "If you have any questions or feedback, please feel free to contact us.",
+    "name": "Name",
+    "namePlaceholder": "John Doe",
+    "nameRequired": "Please enter your name",
+    "email": "Email Address",
+    "emailPlaceholder": "example@example.com",
+    "emailRequired": "Please enter your email address",
+    "emailInvalid": "Please enter a valid email address",
+    "subject": "Subject",
+    "subjectPlaceholder": "Select inquiry type",
+    "subjectRequired": "Please select a subject",
+    "subjectOptions": {
+      "question": "Question",
+      "bug": "Bug Report",
+      "feature": "Feature Request",
+      "other": "Other"
+    },
+    "message": "Message",
+    "messagePlaceholder": "Please enter your inquiry...",
+    "messageRequired": "Please enter a message",
+    "submit": "Send",
+    "sending": "Sending...",
+    "successTitle": "Sent Successfully",
+    "successMessage": "Thank you for contacting us. We will reply as soon as possible.",
+    "errorTitle": "Send Error",
+    "errorMessage": "Failed to send. Please try again."
   }
 }
