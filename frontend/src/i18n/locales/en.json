@@ -158,7 +158,7 @@
       },
       "q6": {
         "question": "Can I use this on iPad/tablet?",
-        "answer": "Yes, you can use this on iPad/tablet.\n\n【How to Use】\n1. Open Safari or Chrome on your iPad\n2. Access this app's URL\n3. Draw with your finger or Apple Pencil\n\n【Touch Controls】\n• Tap the canvas directly to draw\n• Pinch to zoom (browser feature)\n• Scroll prevention keeps the page from moving while drawing\n\n【Local Network Use】\nRun the development server on PC to access from iPad on the same Wi-Fi network."
+        "answer": "Yes, you can use this on iPad/tablet.\n\n【How to Use】\n1. Open Safari or Chrome on your iPad\n2. Access this app's URL\n3. Draw with your finger or Apple Pencil\n\n【Touch Controls】\n• Tap the canvas directly to draw\n• Pinch to zoom (browser feature)\n• Scroll prevention keeps the page from moving while drawing"
       },
       "q7": {
         "question": "Do you collect personal information?",
