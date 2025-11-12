@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { X, Mail, User, MessageSquare, Tag, CheckCircle, AlertCircle } from 'lucide-react'
 import { useLanguage } from '../contexts/LanguageContext'
 
