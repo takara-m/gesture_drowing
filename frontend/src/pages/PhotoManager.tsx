@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Plus, Download, Upload as UploadIcon, Play, Folder as FolderIcon, Trash2 } from 'lucide-react';
+import { Plus, Download, Upload as UploadIcon, Play, Folder as FolderIcon, Trash2, ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { PhotoUploader } from '../components/PhotoUploader';
 import { PhotoGrid } from '../components/PhotoGrid';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -426,8 +427,16 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
           </div>
         )}
 
-        {/* フッター（コピーライト表記） */}
-        <footer className="mt-12 pb-6 text-center">
+        {/* フッター */}
+        <footer className="mt-12 pb-6 text-center space-y-4">
+          {/* 開発者サイトへのリンク */}
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-procreate-card text-white rounded-xl hover:bg-procreate-hover transition-all border border-gray-600"
+          >
+            <ExternalLink size={18} />
+            <span>開発者のWEBサイトはこちら</span>
+          </Link>
           <p className="text-sm text-gray-400">
             © 2025 あんにゅい. All rights reserved.
           </p>

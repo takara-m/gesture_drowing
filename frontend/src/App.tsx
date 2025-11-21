@@ -5,8 +5,7 @@ import Home from './pages/Home'
 import GesdroApp from './pages/GesdroApp'
 import Contact from './pages/Contact'
 import Privacy from './pages/Privacy'
-import DrawingTips from './pages/blog/DrawingTips'
-import TracingBenefits from './pages/blog/TracingBenefits'
+import BlogArticle from './pages/blog/BlogArticle'
 import './App.css'
 
 function App() {
@@ -20,8 +19,7 @@ function App() {
             <Route path="/gesdro/*" element={<GesdroApp />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/privacy" element={<Privacy />} />
-            <Route path="/blog/drawing-tips" element={<DrawingTips />} />
-            <Route path="/blog/tracing-benefits" element={<TracingBenefits />} />
+            <Route path="/blog/:slug" element={<BlogArticle />} />
           </Routes>
         </BrowserRouter>
       </AdSenseProvider>

@@ -15,7 +15,8 @@ interface FaceGestureDrawingToolProps {
 
 const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selectedPhoto, practiceFolderId = null, onBackToPhotos }) => {
   const { t } = useLanguage();
-  const { triggerInterstitial } = useAdSenseContext();
+  // TODO: Re-enable when needed - triggerInterstitialは広告再有効化時に使用
+  const { /* triggerInterstitial */ } = useAdSenseContext();
   const [currentStep, setCurrentStep] = useState(1);
   const [currentPhoto, setCurrentPhoto] = useState<Photo | null>(selectedPhoto || null);
   const [photoUrl, setPhotoUrl] = useState<string>('');
@@ -403,18 +404,19 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
       }
     }
 
-    // 写真が正常に変更された場合、カウンターをインクリメント
+    // TODO: Re-enable when needed - 写真が正常に変更された場合、カウンターをインクリメント
+    // 現在は広告を一時無効化
     if (photoChanged) {
       const newCount = photoChangeCount + 1;
       setPhotoChangeCount(newCount);
       console.log(`[changePhoto] Photo change count: ${newCount}/20`);
 
-      // 20回に達したらインタースティシャル広告を表示してリセット
-      if (newCount >= 20) {
-        console.log('[changePhoto] 20 photo changes reached, showing interstitial ad');
-        triggerInterstitial();
-        setPhotoChangeCount(0);
-      }
+      // // 20回に達したらインタースティシャル広告を表示してリセット
+      // if (newCount >= 20) {
+      //   console.log('[changePhoto] 20 photo changes reached, showing interstitial ad');
+      //   triggerInterstitial();
+      //   setPhotoChangeCount(0);
+      // }
     }
   };
 

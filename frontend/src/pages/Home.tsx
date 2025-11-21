@@ -1,10 +1,27 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../contexts/LanguageContext'
 import { Pencil, BookOpen, Mail, Globe } from 'lucide-react'
 import { AnimatedLogo } from '../components/AnimatedLogo'
 
+interface ArticleMeta {
+  slug: string
+  title: string
+  category: string
+  date: string
+  excerpt: string
+}
+
 export default function Home() {
   const { language, setLanguage, t } = useLanguage()
+  const [articles, setArticles] = useState<ArticleMeta[]>([])
+
+  useEffect(() => {
+    fetch('/blog/index.json')
+      .then(res => res.json())
+      .then(data => setArticles(data.articles))
+      .catch(() => setArticles([]))
+  }, [])
 
   const toggleLanguage = () => {
     setLanguage(language === 'ja' ? 'en' : 'ja')
@@ -112,45 +129,20 @@ export default function Home() {
           </h3>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Link
-              to="/blog/drawing-tips"
-              className="group bg-gray-800 rounded-2xl p-6 hover:bg-gray-750 transition-all hover:scale-[1.02] border border-gray-700"
-            >
-              <div className="flex items-center gap-2 text-orange-400 mb-3">
-                <BookOpen size={18} />
-                <span className="text-sm">
-                  {language === 'ja' ? 'チュートリアル' : 'Tutorial'}
-                </span>
-              </div>
-              <h4 className="text-lg font-bold mb-2">
-                {language === 'ja' ? '顔の描き方のコツ：初心者向けガイド' : 'Tips for Drawing Faces: A Beginner\'s Guide'}
-              </h4>
-              <p className="text-gray-400 text-sm">
-                {language === 'ja'
-                  ? '顔を描くときの基本的なプロポーションと、よくある間違いを避けるコツを紹介します。'
-                  : 'Learn the basic proportions for drawing faces and tips to avoid common mistakes.'}
-              </p>
-            </Link>
-
-            <Link
-              to="/blog/tracing-benefits"
-              className="group bg-gray-800 rounded-2xl p-6 hover:bg-gray-750 transition-all hover:scale-[1.02] border border-gray-700"
-            >
-              <div className="flex items-center gap-2 text-orange-400 mb-3">
-                <BookOpen size={18} />
-                <span className="text-sm">
-                  {language === 'ja' ? '練習法' : 'Practice Method'}
-                </span>
-              </div>
-              <h4 className="text-lg font-bold mb-2">
-                {language === 'ja' ? 'トレース練習が上達に効果的な理由' : 'Why Tracing Practice is Effective for Improvement'}
-              </h4>
-              <p className="text-gray-400 text-sm">
-                {language === 'ja'
-                  ? 'トレース練習は「ズル」ではありません。なぜプロも推奨する練習法なのかを解説します。'
-                  : 'Tracing is not "cheating". Learn why professionals recommend this practice method.'}
-              </p>
-            </Link>
+            {articles.map(article => (
+              <Link
+                key={article.slug}
+                to={`/blog/${article.slug}`}
+                className="group bg-gray-800 rounded-2xl p-6 hover:bg-gray-750 transition-all hover:scale-[1.02] border border-gray-700"
+              >
+                <div className="flex items-center gap-2 text-orange-400 mb-3">
+                  <BookOpen size={18} />
+                  <span className="text-sm">{article.category}</span>
+                </div>
+                <h4 className="text-lg font-bold mb-2">{article.title}</h4>
+                <p className="text-gray-400 text-sm">{article.excerpt}</p>
+              </Link>
+            ))}
           </div>
         </section>
 

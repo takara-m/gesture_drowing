@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { Globe, HelpCircle, Mail, Home } from 'lucide-react'
+import { Globe, HelpCircle, Mail } from 'lucide-react'
 import FaceGestureDrawingTool from '../components/FaceGestureDrawingTool'
 import ContactModal from '../components/ContactModal'
 import { PhotoManager } from './PhotoManager'
@@ -20,32 +19,35 @@ export default function GesdroApp() {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
 
   // 広告管理用のContext
-  const { showInterstitial, triggerInterstitial, closeInterstitial } = useAdSenseContext()
+  // TODO: Re-enable when needed - triggerInterstitialは広告再有効化時に使用
+  const { showInterstitial, /* triggerInterstitial, */ closeInterstitial } = useAdSenseContext()
 
-  // ビュー変更を検出してインタースティシャル広告を表示
+  // TODO: Re-enable when needed - ビュー変更を検出してインタースティシャル広告を表示
+  // 現在は広告を一時無効化
   useEffect(() => {
     if (previousView !== currentView) {
       console.log(`[App] View changed: ${previousView} -> ${currentView}`);
-
-      // 練習画面から戻る際は広告をスキップ
-      if (previousView === 'drawing' && currentView === 'photos') {
-        console.log('[App] Returning from practice screen, skipping interstitial ad');
-        setPreviousView(currentView);
-        return;
-      }
-
-      // FAQ関連の遷移は広告をスキップ（開く・戻る両方）
-      if (currentView === 'faq' || previousView === 'faq') {
-        console.log('[App] FAQ transition, skipping interstitial ad');
-        setPreviousView(currentView);
-        return;
-      }
-
-      // その他の遷移は広告を表示
-      triggerInterstitial();
       setPreviousView(currentView);
+
+      // // 練習画面から戻る際は広告をスキップ
+      // if (previousView === 'drawing' && currentView === 'photos') {
+      //   console.log('[App] Returning from practice screen, skipping interstitial ad');
+      //   setPreviousView(currentView);
+      //   return;
+      // }
+
+      // // FAQ関連の遷移は広告をスキップ（開く・戻る両方）
+      // if (currentView === 'faq' || previousView === 'faq') {
+      //   console.log('[App] FAQ transition, skipping interstitial ad');
+      //   setPreviousView(currentView);
+      //   return;
+      // }
+
+      // // その他の遷移は広告を表示
+      // triggerInterstitial();
+      // setPreviousView(currentView);
     }
-  }, [currentView, previousView, triggerInterstitial])
+  }, [currentView, previousView])
 
   const handlePhotoSelect = (photo: Photo, folderId: string | null = null) => {
     setSelectedPhoto(photo)
@@ -67,15 +69,6 @@ export default function GesdroApp() {
 
       {/* ヘッダーボタン（固定位置・レスポンシブ対応） */}
       <div className="fixed top-4 right-4 z-50 flex flex-col sm:flex-row gap-2">
-        {/* ホームへ戻るボタン */}
-        <Link
-          to="/"
-          className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-procreate-card text-white rounded-xl hover:bg-procreate-hover shadow-lg transition-all hover:scale-[0.98] active:scale-[0.98] border border-gray-600"
-          title={language === 'ja' ? 'ホームに戻る' : 'Back to Home'}
-        >
-          <Home size={20} />
-        </Link>
-
         {/* お問い合わせボタン */}
         <button
           onClick={() => setIsContactModalOpen(true)}
