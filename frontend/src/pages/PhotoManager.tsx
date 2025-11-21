@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Plus, Download, Upload as UploadIcon, Play, Folder as FolderIcon, Trash2, ExternalLink } from 'lucide-react';
+import { Plus, Download, Upload as UploadIcon, Play, Folder as FolderIcon, Trash2, ExternalLink, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { PhotoUploader } from '../components/PhotoUploader';
 import { PhotoGrid } from '../components/PhotoGrid';
@@ -27,6 +27,7 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null); // null = 「全て」
   const [practiceFolderId, setPracticeFolderId] = useState<string | null>(null); // 練習用フォルダ選択
   const [folderPhotoCounts, setFolderPhotoCounts] = useState<Map<string | null, number>>(new Map());
+  const [showFolderHelpModal, setShowFolderHelpModal] = useState(false); // フォルダヘルプモーダル
 
   // フォルダリストを読み込み
   useEffect(() => {
@@ -195,75 +196,87 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
       <div className="max-w-7xl mx-auto space-y-6">
         {/* ①練習開始セクション */}
         <div className="bg-procreate-card rounded-lg shadow-md p-8">
-          <div className="bg-procreate-tag rounded-lg p-6">
-            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-              <Play size={28} className="text-procreate-accent" />
-              {t('photoManager.practiceStart.title')}
-            </h2>
-            <p className="text-sm text-gray-300 mb-4">
-              {t('photoManager.practiceStart.description')}
-            </p>
+          <div className="flex flex-wrap gap-6">
+            {/* 左側：練習開始フォーム */}
+            <div className="flex-1 min-w-[300px] bg-procreate-tag rounded-lg p-6">
+              <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                <Play size={28} className="text-procreate-accent" />
+                {t('photoManager.practiceStart.title')}
+              </h2>
+              <p className="text-sm text-gray-300 mb-4">
+                {t('photoManager.practiceStart.description')}
+              </p>
 
-            {/* フォルダ選択 */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-white mb-2">
-                {t('photoManager.practiceStart.folder')}
-              </label>
-              <select
-                value={practiceFolderId || ''}
-                onChange={(e) => setPracticeFolderId(e.target.value || null)}
-                className="w-full max-w-xs px-4 py-2 bg-procreate-bg text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-procreate-accent focus:border-transparent"
-              >
-                <option className="bg-white text-gray-900" value="">{t('photoManager.practiceStart.allPhotos')} ({folderPhotoCounts.get(null) || 0})</option>
-                {folders.map(folder => (
-                  <option className="bg-white text-gray-900" key={folder.id} value={folder.id}>
-                    {folder.name} ({folderPhotoCounts.get(folder.id) || 0})
-                  </option>
-                ))}
-              </select>
-            </div>
+              {/* フォルダ選択 */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-white mb-2">
+                  {t('photoManager.practiceStart.folder')}
+                </label>
+                <select
+                  value={practiceFolderId || ''}
+                  onChange={(e) => setPracticeFolderId(e.target.value || null)}
+                  className="w-full max-w-xs px-4 py-2 bg-procreate-bg text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-procreate-accent focus:border-transparent"
+                >
+                  <option className="bg-white text-gray-900" value="">{t('photoManager.practiceStart.allPhotos')} ({folderPhotoCounts.get(null) || 0})</option>
+                  {folders.map(folder => (
+                    <option className="bg-white text-gray-900" key={folder.id} value={folder.id}>
+                      {folder.name} ({folderPhotoCounts.get(folder.id) || 0})
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-            {/* 順序選択と開始ボタン */}
-            <div className="flex flex-wrap items-center gap-4">
-              <div className="flex flex-wrap gap-2">
+              {/* 順序選択と開始ボタン */}
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setSelectedOrder('oldest')}
+                    className={`px-3 py-2 rounded-xl font-semibold transition-all hover:scale-[0.98] active:scale-[0.98] ${
+                      selectedOrder === 'oldest'
+                        ? 'bg-procreate-accent text-white shadow-lg'
+                        : 'bg-procreate-bg text-white hover:bg-procreate-hover'
+                    }`}
+                  >
+                    {t('photoManager.practiceStart.oldest')}
+                  </button>
+                  <button
+                    onClick={() => setSelectedOrder('newest')}
+                    className={`px-3 py-2 rounded-xl font-semibold transition-all hover:scale-[0.98] active:scale-[0.98] ${
+                      selectedOrder === 'newest'
+                        ? 'bg-procreate-accent text-white shadow-lg'
+                        : 'bg-procreate-bg text-white hover:bg-procreate-hover'
+                    }`}
+                  >
+                    {t('photoManager.practiceStart.newest')}
+                  </button>
+                  <button
+                    onClick={() => setSelectedOrder('random')}
+                    className={`px-3 py-2 rounded-xl font-semibold transition-all hover:scale-[0.98] active:scale-[0.98] ${
+                      selectedOrder === 'random'
+                        ? 'bg-procreate-accent text-white shadow-lg'
+                        : 'bg-procreate-bg text-white hover:bg-procreate-hover'
+                    }`}
+                  >
+                    {t('photoManager.practiceStart.random')}
+                  </button>
+                </div>
                 <button
-                  onClick={() => setSelectedOrder('oldest')}
-                  className={`px-3 py-2 rounded-xl font-semibold transition-all hover:scale-[0.98] active:scale-[0.98] ${
-                    selectedOrder === 'oldest'
-                      ? 'bg-procreate-accent text-white shadow-lg'
-                      : 'bg-procreate-bg text-white hover:bg-procreate-hover'
-                  }`}
+                  onClick={handleStartPractice}
+                  className="flex items-center gap-2 px-8 py-3 bg-procreate-accent text-white rounded-xl hover:bg-blue-600 hover:scale-[0.98] active:scale-[0.98] transition-all font-bold text-lg"
                 >
-                  {t('photoManager.practiceStart.oldest')}
-                </button>
-                <button
-                  onClick={() => setSelectedOrder('newest')}
-                  className={`px-3 py-2 rounded-xl font-semibold transition-all hover:scale-[0.98] active:scale-[0.98] ${
-                    selectedOrder === 'newest'
-                      ? 'bg-procreate-accent text-white shadow-lg'
-                      : 'bg-procreate-bg text-white hover:bg-procreate-hover'
-                  }`}
-                >
-                  {t('photoManager.practiceStart.newest')}
-                </button>
-                <button
-                  onClick={() => setSelectedOrder('random')}
-                  className={`px-3 py-2 rounded-xl font-semibold transition-all hover:scale-[0.98] active:scale-[0.98] ${
-                    selectedOrder === 'random'
-                      ? 'bg-procreate-accent text-white shadow-lg'
-                      : 'bg-procreate-bg text-white hover:bg-procreate-hover'
-                  }`}
-                >
-                  {t('photoManager.practiceStart.random')}
+                  <Play size={24} />
+                  {t('photoManager.practiceStart.startButton')}
                 </button>
               </div>
-              <button
-                onClick={handleStartPractice}
-                className="flex items-center gap-2 px-8 py-3 bg-procreate-accent text-white rounded-xl hover:bg-blue-600 hover:scale-[0.98] active:scale-[0.98] transition-all font-bold text-lg"
-              >
-                <Play size={24} />
-                {t('photoManager.practiceStart.startButton')}
-              </button>
+            </div>
+
+            {/* 右側：使い方GIF */}
+            <div className="flex-shrink-0">
+              <img
+                src="/assets/Animation6.gif"
+                alt="使い方"
+                className="w-64 h-auto rounded-lg border border-gray-600"
+              />
             </div>
           </div>
         </div>
@@ -285,11 +298,19 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
           </div>
 
           {/* フォルダ機能の説明 */}
-          <div className="bg-procreate-tag rounded-lg p-4 mb-6">
+          <div className="bg-procreate-tag rounded-lg p-4 mb-4">
             <p className="text-sm text-gray-300">
               💡 {t('photoManager.folders.description')}
             </p>
           </div>
+
+          {/* フォルダとは？リンク */}
+          <button
+            onClick={() => setShowFolderHelpModal(true)}
+            className="text-sm text-procreate-accent hover:underline mb-6 block"
+          >
+            フォルダとは？
+          </button>
 
           {/* フォルダリスト（横スクロール） */}
           <div className="flex gap-3 overflow-x-auto pb-2">
@@ -424,6 +445,32 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
               onUploadComplete={handleUploadComplete}
               onClose={() => setShowUploader(false)}
             />
+          </div>
+        )}
+
+        {/* フォルダヘルプモーダル */}
+        {showFolderHelpModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-procreate-card rounded-2xl p-6 max-w-md w-full">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-bold text-white">フォルダとは？</h3>
+                <button
+                  onClick={() => setShowFolderHelpModal(false)}
+                  className="p-2 text-gray-400 hover:text-white transition-colors"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+              <p className="text-gray-300 mb-4">
+                フォルダを使うと、写真をカテゴリ別に整理できます。<br />
+                「手」「猫」「ポーズ」などフォルダを作成すると、フォルダ別に練習が可能になります。
+              </p>
+              <img
+                src="/assets/Animation1.gif"
+                alt="フォルダの使い方"
+                className="w-full rounded-lg border border-gray-600"
+              />
+            </div>
           </div>
         )}
 

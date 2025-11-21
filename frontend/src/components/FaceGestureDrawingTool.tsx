@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Download, Undo2, Redo2, Eraser, Pencil, Minus, Circle, RefreshCw, Eye, EyeOff, ArrowLeft, Image as ImageIcon, Grid } from 'lucide-react';
+import { Download, Undo2, Redo2, Eraser, Pencil, Minus, Circle, RefreshCw, Eye, EyeOff, ArrowLeft, Image as ImageIcon, Grid, X, HelpCircle } from 'lucide-react';
 import type { Photo } from '../services/db';
 import { getRandomPhotoExcept, getPhotoByOrder } from '../services/photoService';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -28,6 +28,7 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
   const [showOverlay, setShowOverlay] = useState(false);
   const [showGrid, setShowGrid] = useState(false);
   const [gridSize, setGridSize] = useState(3);
+  const [showStepHelpModal, setShowStepHelpModal] = useState(false); // Stepヘルプモーダル
   const [gridOpacity, setGridOpacity] = useState(0.3);
   const [overlayOpacity, setOverlayOpacity] = useState(0.3);
   const [imageDimensions, setImageDimensions] = useState({ width: 400, height: 500 });
@@ -448,7 +449,7 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
           </div>
 
           {/* ステップ選択 */}
-          <div className="mb-4 flex gap-2">
+          <div className="mb-4 flex items-center gap-2">
             {[1, 2].map(step => (
               <button
                 key={step}
@@ -462,6 +463,14 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
                 Step {step}
               </button>
             ))}
+            {/* Stepとは？リンク */}
+            <button
+              onClick={() => setShowStepHelpModal(true)}
+              className="flex items-center gap-1 text-xs text-procreate-accent hover:underline ml-2"
+            >
+              <HelpCircle size={14} />
+              Stepとは？
+            </button>
           </div>
 
           {/* 写真切替ボタン */}
@@ -852,6 +861,51 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
           </p>
         </footer>
       </div>
+
+      {/* Stepヘルプモーダル */}
+      {showStepHelpModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-procreate-card rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-white">Stepとは？</h3>
+              <button
+                onClick={() => setShowStepHelpModal(false)}
+                className="p-2 text-gray-400 hover:text-white transition-colors"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            {/* Step 1 説明 */}
+            <div className="mb-6">
+              <h4 className="text-lg font-bold text-procreate-accent mb-2">Step 1：トレースモード</h4>
+              <p className="text-gray-300 mb-3">
+                写真の上に直接描画できます。透明度を調整しながら、<br />
+                輪郭や特徴をなぞって練習しましょう。
+              </p>
+              <img
+                src="/assets/Animation2.gif"
+                alt="Step 1の使い方"
+                className="w-full rounded-lg border border-gray-600"
+              />
+            </div>
+
+            {/* Step 2 説明 */}
+            <div>
+              <h4 className="text-lg font-bold text-procreate-accent mb-2">Step 2：独立描画モード</h4>
+              <p className="text-gray-300 mb-3">
+                写真を見ながら、自分の力で描く練習をします。<br />
+                「答え合わせ」機能で、描いた絵と写真を重ねて確認できます。
+              </p>
+              <img
+                src="/assets/Animation5.gif"
+                alt="Step 2の使い方"
+                className="w-full rounded-lg border border-gray-600"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
