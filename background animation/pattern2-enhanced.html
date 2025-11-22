@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pattern 2 - Enhanced Circle Movement</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', 'Noto Sans JP', sans-serif;
+      overflow-x: hidden;
+    }
+
+    .pattern-section {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pattern-info {
+      position: absolute;
+      top: 40px;
+      left: 40px;
+      color: white;
+      z-index: 10;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 20px 30px;
+      border-radius: 8px;
+      backdrop-filter: blur(10px);
+    }
+
+    .pattern-info h2 {
+      font-size: 28px;
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+
+    .pattern-info p {
+      font-size: 16px;
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+
+    /* カードのサンプル */
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 12px 24px rgba(0, 0, 0, 0.15);
+      max-width: 500px;
+      width: 90%;
+      z-index: 5;
+    }
+
+    .card h3 {
+      color: #152f56;
+      font-size: 32px;
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+
+    .card p {
+      color: #666;
+      font-size: 18px;
+      line-height: 1.8;
+      margin-bottom: 15px;
+    }
+
+    .card-button {
+      display: inline-block;
+      background: #152f56;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 16px;
+      margin-top: 10px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(21, 47, 86, 0.3);
+    }
+
+    /* ナビゲーション */
+    .nav {
+      position: fixed;
+      bottom: 40px;
+      right: 40px;
+      z-index: 100;
+      display: flex;
+      gap: 10px;
+    }
+
+    .nav-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .nav-dot:hover {
+      background: rgba(255, 255, 255, 0.8);
+      transform: scale(1.2);
+    }
+
+    .nav-dot.active {
+      background: white;
+      width: 32px;
+      border-radius: 6px;
+    }
+
+    /* ベース背景（キャンバステクスチャ） */
+    .base-canvas {
+      background-color: #152f56;
+      background-image: 
+        linear-gradient(90deg, rgba(229,232,74,0.10) 1px, transparent 1px),
+        linear-gradient(rgba(229,232,74,0.10) 1px, transparent 1px);
+      background-size: 4px 4px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 円の共通スタイル */
+    .circle {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    /* バリエーション1: オリジナル（2つの円） */
+    .bg-v1 .circle:nth-child(1) {
+      width: 400px;
+      height: 400px;
+      top: 0;
+      left: 0;
+      background: radial-gradient(circle, rgba(229, 232, 74, 0.15) 0%, transparent 70%);
+      animation: moveCircle1 15s ease-in-out infinite;
+    }
+
+    .bg-v1 .circle:nth-child(2) {
+      width: 500px;
+      height: 500px;
+      bottom: 0;
+      right: 0;
+      background: radial-gradient(circle, rgba(229, 232, 74, 0.15) 0%, transparent 70%);
+      animation: moveCircle2 18s ease-in-out infinite;
+    }
+
+    /* バリエーション2: 3つの円 */
+    .bg-v2 .circle:nth-child(1) {
+      width: 400px;
+      height: 400px;
+      top: 0;
+      left: 0;
+      background: radial-gradient(circle, rgba(229, 232, 74, 0.15) 0%, transparent 70%);
+      animation: moveCircle1 15s ease-in-out infinite;
+    }
+
+    .bg-v2 .circle:nth-child(2) {
+      width: 500px;
+      height: 500px;
+      bottom: 0;
+      right: 0;
+      background: radial-gradient(circle, rgba(229, 232, 74, 0.15) 0%, transparent 70%);
+      animation: moveCircle2 18s ease-in-out infinite;
+    }
+
+    .bg-v2 .circle:nth-child(3) {
+      width: 450px;
+      height: 450px;
+      top: 50%;
+      left: 50%;
+      margin: -225px 0 0 -225px;
+      background: radial-gradient(circle, rgba(229, 232, 74, 0.15) 0%, transparent 70%);
+      animation: moveCircle3 16s ease-in-out infinite;
+    }
+
+    /* バリエーション3: 3つの円（輪郭強調・薄め） */
+    .bg-v3 .circle:nth-child(1) {
+      width: 400px;
+      height: 400px;
+      top: 0;
+      left: 0;
+      background: 
+        radial-gradient(circle, transparent 65%, rgba(229, 232, 74, 0.25) 65%, rgba(229, 232, 74, 0.25) 70%, transparent 70%),
+        radial-gradient(circle, rgba(229, 232, 74, 0.08) 0%, transparent 70%);
+      animation: moveCircle1 15s ease-in-out infinite;
+    }
+
+    .bg-v3 .circle:nth-child(2) {
+      width: 500px;
+      height: 500px;
+      bottom: 0;
+      right: 0;
+      background: 
+        radial-gradient(circle, transparent 65%, rgba(229, 232, 74, 0.25) 65%, rgba(229, 232, 74, 0.25) 70%, transparent 70%),
+        radial-gradient(circle, rgba(229, 232, 74, 0.08) 0%, transparent 70%);
+      animation: moveCircle2 18s ease-in-out infinite;
+    }
+
+    .bg-v3 .circle:nth-child(3) {
+      width: 450px;
+      height: 450px;
+      top: 50%;
+      left: 50%;
+      margin: -225px 0 0 -225px;
+      background: 
+        radial-gradient(circle, transparent 65%, rgba(229, 232, 74, 0.25) 65%, rgba(229, 232, 74, 0.25) 70%, transparent 70%),
+        radial-gradient(circle, rgba(229, 232, 74, 0.08) 0%, transparent 70%);
+      animation: moveCircle3 16s ease-in-out infinite;
+    }
+
+    /* バリエーション4: 3つの円（輪郭強調・濃いめ） */
+    .bg-v4 .circle:nth-child(1) {
+      width: 400px;
+      height: 400px;
+      top: 0;
+      left: 0;
+      background: 
+        radial-gradient(circle, transparent 60%, rgba(229, 232, 74, 0.35) 60%, rgba(229, 232, 74, 0.35) 68%, transparent 68%),
+        radial-gradient(circle, rgba(229, 232, 74, 0.10) 0%, transparent 70%);
+      animation: moveCircle1 15s ease-in-out infinite;
+    }
+
+    .bg-v4 .circle:nth-child(2) {
+      width: 500px;
+      height: 500px;
+      bottom: 0;
+      right: 0;
+      background: 
+        radial-gradient(circle, transparent 60%, rgba(229, 232, 74, 0.35) 60%, rgba(229, 232, 74, 0.35) 68%, transparent 68%),
+        radial-gradient(circle, rgba(229, 232, 74, 0.10) 0%, transparent 70%);
+      animation: moveCircle2 18s ease-in-out infinite;
+    }
+
+    .bg-v4 .circle:nth-child(3) {
+      width: 450px;
+      height: 450px;
+      top: 50%;
+      left: 50%;
+      margin: -225px 0 0 -225px;
+      background: 
+        radial-gradient(circle, transparent 60%, rgba(229, 232, 74, 0.35) 60%, rgba(229, 232, 74, 0.35) 68%, transparent 68%),
+        radial-gradient(circle, rgba(229, 232, 74, 0.10) 0%, transparent 70%);
+      animation: moveCircle3 16s ease-in-out infinite;
+    }
+
+    /* バリエーション5: 3つの円（二重輪郭） */
+    .bg-v5 .circle:nth-child(1) {
+      width: 400px;
+      height: 400px;
+      top: 0;
+      left: 0;
+      background: 
+        radial-gradient(circle, transparent 55%, rgba(229, 232, 74, 0.30) 55%, rgba(229, 232, 74, 0.30) 60%, transparent 60%),
+        radial-gradient(circle, transparent 65%, rgba(229, 232, 74, 0.25) 65%, rgba(229, 232, 74, 0.25) 70%, transparent 70%),
+        radial-gradient(circle, rgba(229, 232, 74, 0.08) 0%, transparent 70%);
+      animation: moveCircle1 15s ease-in-out infinite;
+    }
+
+    .bg-v5 .circle:nth-child(2) {
+      width: 500px;
+      height: 500px;
+      bottom: 0;
+      right: 0;
+      background: 
+        radial-gradient(circle, transparent 55%, rgba(229, 232, 74, 0.30) 55%, rgba(229, 232, 74, 0.30) 60%, transparent 60%),
+        radial-gradient(circle, transparent 65%, rgba(229, 232, 74, 0.25) 65%, rgba(229, 232, 74, 0.25) 70%, transparent 70%),
+        radial-gradient(circle, rgba(229, 232, 74, 0.08) 0%, transparent 70%);
+      animation: moveCircle2 18s ease-in-out infinite;
+    }
+
+    .bg-v5 .circle:nth-child(3) {
+      width: 450px;
+      height: 450px;
+      top: 50%;
+      left: 50%;
+      margin: -225px 0 0 -225px;
+      background: 
+        radial-gradient(circle, transparent 55%, rgba(229, 232, 74, 0.30) 55%, rgba(229, 232, 74, 0.30) 60%, transparent 60%),
+        radial-gradient(circle, transparent 65%, rgba(229, 232, 74, 0.25) 65%, rgba(229, 232, 74, 0.25) 70%, transparent 70%),
+        radial-gradient(circle, rgba(229, 232, 74, 0.08) 0%, transparent 70%);
+      animation: moveCircle3 16s ease-in-out infinite;
+    }
+
+    /* バリエーション6: 3つの円（細い輪郭） */
+    .bg-v6 .circle:nth-child(1) {
+      width: 400px;
+      height: 400px;
+      top: 0;
+      left: 0;
+      background: 
+        radial-gradient(circle, transparent 67%, rgba(229, 232, 74, 0.40) 67%, rgba(229, 232, 74, 0.40) 70%, transparent 70%),
+        radial-gradient(circle, rgba(229, 232, 74, 0.10) 0%, transparent 70%);
+      animation: moveCircle1 15s ease-in-out infinite;
+    }
+
+    .bg-v6 .circle:nth-child(2) {
+      width: 500px;
+      height: 500px;
+      bottom: 0;
+      right: 0;
+      background: 
+        radial-gradient(circle, transparent 67%, rgba(229, 232, 74, 0.40) 67%, rgba(229, 232, 74, 0.40) 70%, transparent 70%),
+        radial-gradient(circle, rgba(229, 232, 74, 0.10) 0%, transparent 70%);
+      animation: moveCircle2 18s ease-in-out infinite;
+    }
+
+    .bg-v6 .circle:nth-child(3) {
+      width: 450px;
+      height: 450px;
+      top: 50%;
+      left: 50%;
+      margin: -225px 0 0 -225px;
+      background: 
+        radial-gradient(circle, transparent 67%, rgba(229, 232, 74, 0.40) 67%, rgba(229, 232, 74, 0.40) 70%, transparent 70%),
+        radial-gradient(circle, rgba(229, 232, 74, 0.10) 0%, transparent 70%);
+      animation: moveCircle3 16s ease-in-out infinite;
+    }
+
+    /* アニメーション定義 */
+    @keyframes moveCircle1 {
+      0%, 100% { transform: translate(0, 0); }
+      25% { transform: translate(30vw, 20vh); }
+      50% { transform: translate(60vw, 10vh); }
+      75% { transform: translate(40vw, 40vh); }
+    }
+
+    @keyframes moveCircle2 {
+      0%, 100% { transform: translate(0, 0); }
+      33% { transform: translate(-30vw, -15vh); }
+      66% { transform: translate(-50vw, -30vh); }
+    }
+
+    @keyframes moveCircle3 {
+      0%, 100% { transform: translate(-50%, -50%); }
+      25% { transform: translate(calc(-50% + 20vw), calc(-50% - 15vh)); }
+      50% { transform: translate(calc(-50% - 25vw), calc(-50% + 20vh)); }
+      75% { transform: translate(calc(-50% + 10vw), calc(-50% + 10vh)); }
+    }
+
+    /* スムーススクロール */
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+<body>
+  <!-- バリエーション1: オリジナル -->
+  <section id="v1" class="pattern-section base-canvas bg-v1">
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="pattern-info">
+      <h2>バリエーション1: オリジナル</h2>
+      <p>2つの円<br>輪郭: なし</p>
+    </div>
+    <div class="card">
+      <h3>新規キャンバス</h3>
+      <p>元のパターン2。シンプルに2つの円が移動します。</p>
+      <a href="#" class="card-button">描き始める</a>
+    </div>
+  </section>
+
+  <!-- バリエーション2: 3つの円 -->
+  <section id="v2" class="pattern-section base-canvas bg-v2">
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="pattern-info">
+      <h2>バリエーション2: 3つの円</h2>
+      <p>3つの円<br>輪郭: なし</p>
+    </div>
+    <div class="card">
+      <h3>新規キャンバス</h3>
+      <p>円を3つに増やしたバージョン。より動きが豊かになります。</p>
+      <a href="#" class="card-button">描き始める</a>
+    </div>
+  </section>
+
+  <!-- バリエーション3: 輪郭強調（薄め） -->
+  <section id="v3" class="pattern-section base-canvas bg-v3">
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="pattern-info">
+      <h2>バリエーション3: 輪郭（薄め）</h2>
+      <p>3つの円<br>輪郭: 薄め</p>
+    </div>
+    <div class="card">
+      <h3>新規キャンバス</h3>
+      <p>円の輪郭を薄く追加。柔らかい印象を保ちながら形を強調。</p>
+      <a href="#" class="card-button">描き始める</a>
+    </div>
+  </section>
+
+  <!-- バリエーション4: 輪郭強調（濃いめ） -->
+  <section id="v4" class="pattern-section base-canvas bg-v4">
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="pattern-info">
+      <h2>バリエーション4 ⭐おすすめ</h2>
+      <p>3つの円<br>輪郭: 濃いめ</p>
+    </div>
+    <div class="card">
+      <h3>新規キャンバス</h3>
+      <p>円の輪郭をはっきりと強調。円の存在感がしっかり出ます。</p>
+      <a href="#" class="card-button">描き始める</a>
+    </div>
+  </section>
+
+  <!-- バリエーション5: 二重輪郭 -->
+  <section id="v5" class="pattern-section base-canvas bg-v5">
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="pattern-info">
+      <h2>バリエーション5: 二重輪郭</h2>
+      <p>3つの円<br>輪郭: 二重</p>
+    </div>
+    <div class="card">
+      <h3>新規キャンバス</h3>
+      <p>二重の輪郭で立体感を演出。より複雑で洗練された印象。</p>
+      <a href="#" class="card-button">描き始める</a>
+    </div>
+  </section>
+
+  <!-- バリエーション6: 細い輪郭 -->
+  <section id="v6" class="pattern-section base-canvas bg-v6">
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="pattern-info">
+      <h2>バリエーション6: 細い輪郭</h2>
+      <p>3つの円<br>輪郭: 細くて濃い</p>
+    </div>
+    <div class="card">
+      <h3>新規キャンバス</h3>
+      <p>細くて濃い輪郭で繊細に強調。シャープで現代的な印象。</p>
+      <a href="#" class="card-button">描き始める</a>
+    </div>
+  </section>
+
+  <!-- ナビゲーションドット -->
+  <div class="nav">
+    <a href="#v1" class="nav-dot active"></a>
+    <a href="#v2" class="nav-dot"></a>
+    <a href="#v3" class="nav-dot"></a>
+    <a href="#v4" class="nav-dot"></a>
+    <a href="#v5" class="nav-dot"></a>
+    <a href="#v6" class="nav-dot"></a>
+  </div>
+
+  <script>
+    // ナビゲーションドットのアクティブ状態を更新
+    const sections = document.querySelectorAll('.pattern-section');
+    const navDots = document.querySelectorAll('.nav-dot');
+
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.5
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const index = Array.from(sections).indexOf(entry.target);
+          navDots.forEach(dot => dot.classList.remove('active'));
+          navDots[index].classList.add('active');
+        }
+      });
+    }, observerOptions);
+
+    sections.forEach(section => {
+      observer.observe(section);
+    });
+  </script>
+</body>
+</html>

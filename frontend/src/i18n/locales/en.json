@@ -21,7 +21,10 @@
       "oldest": "Oldest",
       "newest": "Newest",
       "random": "Random",
-      "startButton": "Start"
+      "startButton": "Start",
+      "catchphrase1": "The more you draw, the more you find your rhythm",
+      "catchphrase2": "With every line, you'll discover new techniques",
+      "catchphrase3": "Let's start today's practice!"
     },
     "folders": {
       "title": "Folders",

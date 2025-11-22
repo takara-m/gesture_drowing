@@ -1,18 +1,20 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm create:*)",
-      "Bash(npm install)",
-      "Bash(npm install:*)",
-      "Bash(npm install lucide-react)",
-      "Bash(npx tailwindcss init:*)",
-      "Bash(npm run dev)",
-      "Bash(git init:*)",
+      "WebFetch(domain:gesture-drowing-git-master-takara-ms-projects.vercel.app)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git remote add:*)",
       "Bash(git push:*)",
-      "Bash(npm run build)"
+      "Bash(npm run dev:*)",
+      "Bash(npm run build:*)",
+      "Bash(git branch:*)",
+      "Bash(git fetch:*)",
+      "WebSearch",
+      "WebFetch(domain:adsterra.com)",
+      "WebFetch(domain:hilltopads.com)",
+      "WebFetch(domain:pomodoro.lit-gallery.com)",
+      "Bash(cd:*)",
+      "Bash(npm install:*)"
     ],
     "deny": [],
     "ask": []

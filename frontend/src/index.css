@@ -6,10 +6,167 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #1E1E1E;
+  background-color: #093d44;
   color: #FFFFFF;
 }
 
 html {
-  background-color: #1E1E1E;
+  background-color: #093d44;
+}
+
+/* Gesdro背景アニメーション（バリエーション2: 3つの円） */
+.gesdro-bg {
+  background-color: #093d44;
+  background-image:
+    linear-gradient(90deg, rgba(175,178,36,0.10) 1px, transparent 1px),
+    linear-gradient(rgba(175,178,36,0.10) 1px, transparent 1px);
+  background-size: 4px 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* アニメーションする円 */
+.gesdro-bg .circle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.gesdro-bg .circle:nth-child(1) {
+  width: 400px;
+  height: 400px;
+  top: 0;
+  left: 0;
+  background: radial-gradient(circle, rgba(175, 178, 36, 0.15) 0%, transparent 70%);
+  animation: moveCircle1 15s ease-in-out infinite;
+}
+
+.gesdro-bg .circle:nth-child(2) {
+  width: 500px;
+  height: 500px;
+  bottom: 0;
+  right: 0;
+  background: radial-gradient(circle, rgba(175, 178, 36, 0.15) 0%, transparent 70%);
+  animation: moveCircle2 18s ease-in-out infinite;
+}
+
+.gesdro-bg .circle:nth-child(3) {
+  width: 450px;
+  height: 450px;
+  top: 50%;
+  left: 50%;
+  margin: -225px 0 0 -225px;
+  background: radial-gradient(circle, rgba(175, 178, 36, 0.15) 0%, transparent 70%);
+  animation: moveCircle3 16s ease-in-out infinite;
+}
+
+/* 円のアニメーション */
+@keyframes moveCircle1 {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(30vw, 20vh); }
+  50% { transform: translate(60vw, 10vh); }
+  75% { transform: translate(40vw, 40vh); }
+}
+
+@keyframes moveCircle2 {
+  0%, 100% { transform: translate(0, 0); }
+  33% { transform: translate(-30vw, -15vh); }
+  66% { transform: translate(-50vw, -30vh); }
+}
+
+@keyframes moveCircle3 {
+  0%, 100% { transform: translate(-50%, -50%); }
+  25% { transform: translate(calc(-50% + 20vw), calc(-50% - 15vh)); }
+  50% { transform: translate(calc(-50% - 25vw), calc(-50% + 20vh)); }
+  75% { transform: translate(calc(-50% + 10vw), calc(-50% + 10vh)); }
+}
+
+/* ぷるぷるアニメーション */
+@keyframes poyoyon3 {
+  0%, 40% {
+    transform: skew(0deg, 0deg);
+  }
+  5% {
+    transform: skew(5deg, 5deg);
+  }
+  10% {
+    transform: skew(-4deg, -4deg);
+  }
+  15% {
+    transform: skew(3deg, 3deg);
+  }
+  20% {
+    transform: skew(-2deg, -2deg);
+  }
+  25% {
+    transform: skew(1deg, 1deg);
+  }
+  30% {
+    transform: skew(-0.6deg, -0.6deg);
+  }
+  35% {
+    transform: skew(0.3deg, 0.3deg);
+  }
+}
+
+.animate-poyoyon3 {
+  animation: poyoyon3 2.5s infinite;
+}
+
+/* Glassmorphism カードエフェクト */
+.glass-card {
+  backdrop-filter: blur(1px) saturate(200%);
+  -webkit-backdrop-filter: blur(1px) saturate(200%);
+  background-color: rgba(17, 25, 40, 0.76);
+  border: 1px solid rgba(255, 255, 255, 0.125);
+}
+
+/* ボタンエフェクト（順序選択） */
+.neuro-button {
+  border-radius: 11px;
+  background: #6b6b6b;
+  box-shadow: 0 7px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.neuro-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* 選択済みボタン */
+.neuro-button.selected {
+  background: #79b47b;
+}
+
+/* 開始ボタンエフェクト */
+.start-button {
+  border-radius: 11px;
+  background: #79b47b;
+  border: 1px solid #79b47b;
+  box-shadow: 0 7px 10px rgba(0, 0, 0, 0.1);
+  position: relative;
+  animation: anima-start-button 2s infinite;
+}
+
+@keyframes anima-start-button {
+  0% {
+    box-shadow: 0 0 0 0 rgba(121, 180, 123, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 0 1.2em rgba(0, 0, 0, 0);
+  }
+}
+
+/* 写真グリッドエフェクト */
+.neuro-photo {
+  border-radius: 11px;
+  background: #79b47b;
+  box-shadow: 0 7px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.neuro-photo:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 10px rgba(0, 0, 0, 0.15);
 }

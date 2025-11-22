@@ -184,7 +184,7 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
   };
 
   return (
-    <div className="min-h-screen bg-procreate-bg p-6">
+    <div className="min-h-screen p-6">
       {/* ロゴセクション（最上部・中央寄せ・レスポンシブ） */}
       <div className="flex justify-center mb-8">
         <AnimatedLogo />
@@ -194,22 +194,22 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
       <AdBanner slot="1234567890" format="auto" responsive={true} />
 
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* ①練習開始セクション */}
-        <div className="bg-procreate-card rounded-lg shadow-md p-8">
-          <div className="flex flex-wrap gap-6">
+        {/* ①練習開始セクション（Heroレイアウト） */}
+        <div className="glass-card rounded-lg shadow-md p-8 relative">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* 左側：練習開始フォーム */}
-            <div className="flex-1 min-w-[300px] bg-procreate-tag rounded-lg p-6">
+            <div className="flex flex-col">
               <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
                 <Play size={28} className="text-procreate-accent" />
                 {t('photoManager.practiceStart.title')}
               </h2>
-              <p className="text-sm text-gray-300 mb-4">
+              <p className="text-sm text-gray-300 mb-4 text-center">
                 {t('photoManager.practiceStart.description')}
               </p>
 
               {/* フォルダ選択 */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white mb-2">
+              <div className="mb-4 flex flex-col items-center">
+                <label className="block text-sm font-medium text-white mb-2 text-center">
                   {t('photoManager.practiceStart.folder')}
                 </label>
                 <select
@@ -226,63 +226,68 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
                 </select>
               </div>
 
-              {/* 順序選択と開始ボタン */}
-              <div className="flex flex-wrap items-center gap-4">
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={() => setSelectedOrder('oldest')}
-                    className={`px-3 py-2 rounded-xl font-semibold transition-all hover:scale-[0.98] active:scale-[0.98] ${
-                      selectedOrder === 'oldest'
-                        ? 'bg-procreate-accent text-white shadow-lg'
-                        : 'bg-procreate-bg text-white hover:bg-procreate-hover'
-                    }`}
-                  >
-                    {t('photoManager.practiceStart.oldest')}
-                  </button>
-                  <button
-                    onClick={() => setSelectedOrder('newest')}
-                    className={`px-3 py-2 rounded-xl font-semibold transition-all hover:scale-[0.98] active:scale-[0.98] ${
-                      selectedOrder === 'newest'
-                        ? 'bg-procreate-accent text-white shadow-lg'
-                        : 'bg-procreate-bg text-white hover:bg-procreate-hover'
-                    }`}
-                  >
-                    {t('photoManager.practiceStart.newest')}
-                  </button>
-                  <button
-                    onClick={() => setSelectedOrder('random')}
-                    className={`px-3 py-2 rounded-xl font-semibold transition-all hover:scale-[0.98] active:scale-[0.98] ${
-                      selectedOrder === 'random'
-                        ? 'bg-procreate-accent text-white shadow-lg'
-                        : 'bg-procreate-bg text-white hover:bg-procreate-hover'
-                    }`}
-                  >
-                    {t('photoManager.practiceStart.random')}
-                  </button>
-                </div>
+              {/* 順序選択 */}
+              <div className="flex flex-wrap justify-center gap-3 mb-4">
+                <button
+                  onClick={() => setSelectedOrder('oldest')}
+                  className={`neuro-button px-3 py-2 font-semibold transition-all hover:scale-[0.98] active:scale-[0.98] text-white ${
+                    selectedOrder === 'oldest' ? 'selected' : ''
+                  }`}
+                >
+                  {t('photoManager.practiceStart.oldest')}
+                </button>
+                <button
+                  onClick={() => setSelectedOrder('newest')}
+                  className={`neuro-button px-3 py-2 font-semibold transition-all hover:scale-[0.98] active:scale-[0.98] text-white ${
+                    selectedOrder === 'newest' ? 'selected' : ''
+                  }`}
+                >
+                  {t('photoManager.practiceStart.newest')}
+                </button>
+                <button
+                  onClick={() => setSelectedOrder('random')}
+                  className={`neuro-button px-3 py-2 font-semibold transition-all hover:scale-[0.98] active:scale-[0.98] text-white ${
+                    selectedOrder === 'random' ? 'selected' : ''
+                  }`}
+                >
+                  {t('photoManager.practiceStart.random')}
+                </button>
+              </div>
+
+              {/* 開始ボタン */}
+              <div className="flex justify-center mb-6">
                 <button
                   onClick={handleStartPractice}
-                  className="flex items-center gap-2 px-8 py-3 bg-procreate-accent text-white rounded-xl hover:bg-blue-600 hover:scale-[0.98] active:scale-[0.98] transition-all font-bold text-lg"
+                  className="start-button w-full max-w-xs flex items-center justify-center gap-2 px-8 py-3 text-white hover:scale-[0.98] active:scale-[0.98] transition-all font-bold text-lg"
                 >
                   <Play size={24} />
                   {t('photoManager.practiceStart.startButton')}
                 </button>
               </div>
+
+              {/* キャッチコピー */}
+              <div className="flex-1 flex items-center justify-center text-center border-t border-gray-600 pt-4">
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  {t('photoManager.practiceStart.catchphrase1')}<br />
+                  {t('photoManager.practiceStart.catchphrase2')}<br />
+                  <span className="text-procreate-accent font-semibold">{t('photoManager.practiceStart.catchphrase3')}</span>
+                </p>
+              </div>
             </div>
 
             {/* 右側：使い方GIF */}
-            <div className="flex-shrink-0">
+            <div className="flex items-center justify-center">
               <img
                 src="/assets/Animation6.gif"
                 alt="使い方"
-                className="w-64 h-auto rounded-lg border border-gray-600"
+                className="w-full h-auto max-h-[400px] object-contain rounded-lg"
               />
             </div>
           </div>
         </div>
 
         {/* ②フォルダセクション */}
-        <div className="bg-procreate-card rounded-lg shadow-md p-8">
+        <div className="glass-card rounded-lg shadow-md p-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-white flex items-center gap-2">
               <FolderIcon size={28} className="text-procreate-accent" />
@@ -358,7 +363,7 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
         </div>
 
         {/* ③写真管理セクション */}
-        <div className="bg-procreate-card rounded-lg shadow-md p-8">
+        <div className="glass-card rounded-lg shadow-md p-8">
           <div className="mb-8">
             <div className="flex flex-wrap items-center justify-between mb-6 gap-4">
               <h1 className="text-3xl font-bold text-white">
@@ -451,7 +456,7 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
         {/* フォルダヘルプモーダル */}
         {showFolderHelpModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-procreate-card rounded-2xl p-6 max-w-md w-full">
+            <div className="glass-card rounded-2xl p-6 max-w-md w-full">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold text-white">フォルダとは？</h3>
                 <button

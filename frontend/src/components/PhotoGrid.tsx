@@ -248,7 +248,7 @@ export const PhotoGrid: React.FC<PhotoGridProps> = ({ selectedFolderId = null, o
         {photos.map((photo) => (
           <div
             key={photo.id}
-            className="relative group bg-procreate-card rounded-lg shadow-md hover:shadow-xl transition-shadow"
+            className="relative group neuro-photo hover:shadow-xl transition-shadow"
           >
             {/* 選択モード時のチェックボックス */}
             {selectionMode && (

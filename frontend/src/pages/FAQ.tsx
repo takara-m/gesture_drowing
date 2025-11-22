@@ -19,7 +19,7 @@ const FAQ: React.FC<FAQProps> = ({ onBack }) => {
   };
 
   return (
-    <div className="min-h-screen bg-procreate-bg p-6">
+    <div className="min-h-screen p-6">
       {/* ロゴセクション（最上部・中央寄せ・レスポンシブ） */}
       <div className="flex justify-center mb-6">
         <AnimatedLogo />

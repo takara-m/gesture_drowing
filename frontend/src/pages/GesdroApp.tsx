@@ -60,7 +60,12 @@ export default function GesdroApp() {
   }
 
   return (
-    <>
+    <div className="gesdro-bg min-h-screen">
+      {/* アニメーション円 */}
+      <div className="circle"></div>
+      <div className="circle"></div>
+      <div className="circle"></div>
+
       {/* Google AdSenseスクリプト読み込み */}
       <AdSenseScript clientId={import.meta.env.VITE_ADSENSE_CLIENT_ID || 'ca-pub-0000000000000000'} />
 
@@ -117,6 +122,6 @@ export default function GesdroApp() {
           onBackToPhotos={() => setCurrentView('photos')}
         />
       )}
-    </>
+    </div>
   )
 }

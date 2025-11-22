@@ -21,7 +21,10 @@
       "oldest": "古い順",
       "newest": "新しい順",
       "random": "ランダム",
-      "startButton": "開始"
+      "startButton": "開始",
+      "catchphrase1": "描くほどに、あなたのリズムが見えてくる",
+      "catchphrase2": "線を引くたび、\"コツ\"がどんどん掴めてくる",
+      "catchphrase3": "さあ、今日の練習を始めよう！"
     },
     "folders": {
       "title": "フォルダ",
