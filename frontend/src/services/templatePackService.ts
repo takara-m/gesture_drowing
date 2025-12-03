@@ -77,9 +77,9 @@ export const downloadFreePack = async (packId: string): Promise<void> => {
  * Download purchased pack from backend
  * Phase 2/3: This will make an authenticated API call to fetch the pack data
  */
-export const downloadPurchasedPack = async (packId: string, sessionId: string): Promise<void> => {
+export const downloadPurchasedPack = async (packId: string, _sessionId: string): Promise<void> => {
   // TODO Phase 3: Implement backend API call
-  // const response = await fetch(`/api/download-pack?packId=${packId}&sessionId=${sessionId}`);
+  // const response = await fetch(`/api/download-pack?packId=${packId}&sessionId=${_sessionId}`);
   // if (!response.ok) throw new Error('Download failed');
   // const packData = await response.json();
 

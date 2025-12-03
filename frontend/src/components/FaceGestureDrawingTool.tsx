@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Download, Undo2, Redo2, Eraser, Pencil, Minus, Circle, RefreshCw, Eye, EyeOff, ArrowLeft, Image as ImageIcon, Grid, X, HelpCircle, Trash2, Menu, Settings } from 'lucide-react';
+import { Download, Undo2, Redo2, Eraser, Pencil, Minus, Circle, RefreshCw, Eye, EyeOff, ArrowLeft, Image as ImageIcon, Grid, X, HelpCircle, Trash2, Settings } from 'lucide-react';
 import type { Photo } from '../services/db';
 import { getRandomPhotoExcept, getPhotoByOrder } from '../services/photoService';
 import { useLanguage } from '../contexts/LanguageContext';
