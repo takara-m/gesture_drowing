@@ -8,6 +8,7 @@ import { useLanguage } from '../contexts/LanguageContext'
 import { useAdSenseContext } from '../contexts/AdSenseContext'
 import type { Photo } from '../services/db'
 import { AdSenseScript, AdInterstitial } from '../components/ads'
+import { initializeTemplatePhotos } from '../services/templateService'
 
 export default function GesdroApp() {
   const { language, setLanguage, t } = useLanguage()
@@ -49,6 +50,13 @@ export default function GesdroApp() {
     }
   }, [currentView, previousView])
 
+  // テンプレート写真の初期化（初回のみ）
+  useEffect(() => {
+    initializeTemplatePhotos().catch(error => {
+      console.error('Failed to initialize template photos:', error);
+    });
+  }, [])
+
   const handlePhotoSelect = (photo: Photo, folderId: string | null = null) => {
     setSelectedPhoto(photo)
     setPracticeFolderId(folderId)
@@ -72,8 +80,8 @@ export default function GesdroApp() {
       {/* インタースティシャル広告 */}
       <AdInterstitial show={showInterstitial} onClose={closeInterstitial} />
 
-      {/* ヘッダーボタン（固定位置・レスポンシブ対応） */}
-      <div className="fixed top-4 right-4 z-50 flex flex-col sm:flex-row gap-2">
+      {/* ヘッダーボタン */}
+      <div className="mb-6 flex flex-row w-fit">
         {/* お問い合わせボタン */}
         <button
           onClick={() => setIsContactModalOpen(true)}

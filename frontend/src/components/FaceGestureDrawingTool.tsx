@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Download, Undo2, Redo2, Eraser, Pencil, Minus, Circle, RefreshCw, Eye, EyeOff, ArrowLeft, Image as ImageIcon, Grid, X, HelpCircle } from 'lucide-react';
+import { Download, Undo2, Redo2, Eraser, Pencil, Minus, Circle, RefreshCw, Eye, EyeOff, ArrowLeft, Image as ImageIcon, Grid, X, HelpCircle, Trash2, Menu, Settings } from 'lucide-react';
 import type { Photo } from '../services/db';
 import { getRandomPhotoExcept, getPhotoByOrder } from '../services/photoService';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -32,6 +32,8 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
   const [gridOpacity, setGridOpacity] = useState(0.3);
   const [overlayOpacity, setOverlayOpacity] = useState(0.3);
   const [imageDimensions, setImageDimensions] = useState({ width: 400, height: 500 });
+  const [isDrawerOpen, setIsDrawerOpen] = useState(true); // ドロワー開閉状態
+  const [showGridModal, setShowGridModal] = useState(false); // グリッドモーダル開閉状態
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const isDrawingRef = useRef(false);
@@ -436,16 +438,18 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
               {onBackToPhotos && (
                 <button
                   onClick={onBackToPhotos}
-                  className="flex items-center gap-2 px-4 py-2 bg-procreate-tag text-white rounded-xl hover:bg-procreate-hover transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-sm text-white rounded-2xl border border-white/10 shadow-sm hover:shadow-md transition-all duration-200"
                 >
                   <ArrowLeft size={20} />
                   {t('drawingTool.backToPhotos')}
                 </button>
               )}
             </div>
-            <p className="text-white text-lg">
-              Step {currentStep}: {t(`drawingTool.steps.${currentStep}`)}
-            </p>
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl px-4 py-3 shadow-sm">
+              <p className="text-white text-lg font-semibold">
+                Step {currentStep}: {t(`drawingTool.steps.${currentStep}`)}
+              </p>
+            </div>
           </div>
 
           {/* ステップ選択 */}
@@ -454,10 +458,10 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
               <button
                 key={step}
                 onClick={() => setCurrentStep(step)}
-                className={`px-6 py-3 rounded-xl font-semibold transition-all hover:scale-[0.98] active:scale-[0.98] ${
+                className={`px-6 py-3 rounded-2xl font-semibold transition-all duration-200 border border-white/10 ${
                   currentStep === step
                     ? 'bg-procreate-accent text-white shadow-lg'
-                    : 'bg-procreate-tag text-white hover:bg-procreate-hover'
+                    : 'bg-white/5 backdrop-blur-sm text-white shadow-sm hover:shadow-md'
                 }`}
               >
                 Step {step}
@@ -477,7 +481,7 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
           <div className="mb-6">
             <button
               onClick={changePhoto}
-              className="flex items-center gap-2 px-6 py-3 bg-procreate-tag text-white rounded-xl hover:bg-procreate-hover hover:scale-[0.98] active:scale-[0.98] transition-all"
+              className="flex items-center gap-2 px-6 py-3 bg-white/5 backdrop-blur-sm text-white rounded-2xl border border-white/10 shadow-sm hover:shadow-md transition-all duration-200"
             >
               <RefreshCw size={20} />
               {t('drawingTool.changePhoto')}
@@ -485,9 +489,14 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
           </div>
 
           {/* メインコンテンツ */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-6 items-start">
-            {/* 左側: 参考写真 */}
-            <div className="space-y-4">
+          <div className={`gap-4 mb-6 ${
+            currentStep === 1
+              ? 'flex justify-center'
+              : 'grid grid-cols-1 lg:grid-cols-2 items-start'
+          }`}>
+            {/* 左側: 参考写真（Step2のみ表示） */}
+            {currentStep === 2 && (
+            <div className="space-y-4 max-w-[600px] mx-auto">
               <h2 className="text-xl font-semibold text-white">{t('drawingTool.referencePhoto')}</h2>
               <div className="relative border border-gray-600 overflow-hidden bg-procreate-bg rounded-lg">
                 {photoUrl ? (
@@ -547,9 +556,10 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
                 )}
               </div>
             </div>
+            )}
 
             {/* 右側: 描画スペース */}
-            <div className="space-y-4">
+            <div className="space-y-4 max-w-[600px] mx-auto">
               <h2 className="text-xl font-semibold text-white">{t('drawingTool.drawingSpace')}</h2>
               <div className="relative border border-gray-600 overflow-hidden bg-white rounded-lg">
                 {/* Step1: 背景に参考写真を表示 */}
@@ -683,172 +693,6 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
               </div>
             </div>
           </div>
-
-          {/* ツールバー */}
-          <div className="bg-procreate-tag rounded-lg p-6 space-y-4">
-            {/* 描画ツール */}
-            <div className="flex flex-wrap gap-4 items-center">
-              <button
-                onClick={undo}
-                disabled={historyStep <= 0}
-                className="flex items-center gap-2 px-4 py-2 bg-procreate-bg text-white rounded-xl hover:bg-procreate-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:scale-[0.98] active:scale-[0.98]"
-              >
-                <Undo2 size={18} />
-                {t('drawingTool.toolbar.undo')}
-              </button>
-              <button
-                onClick={redo}
-                disabled={historyStep >= history.length - 1}
-                className="flex items-center gap-2 px-4 py-2 bg-procreate-bg text-white rounded-xl hover:bg-procreate-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:scale-[0.98] active:scale-[0.98]"
-              >
-                <Redo2 size={18} />
-                {t('drawingTool.toolbar.redo')}
-              </button>
-              <button
-                onClick={() => {
-                  setDrawingMode('pen');
-                  setIsEraser(false);
-                }}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all hover:scale-[0.98] active:scale-[0.98] ${
-                  drawingMode === 'pen' && !isEraser
-                    ? 'bg-procreate-accent text-white shadow-md'
-                    : 'bg-procreate-bg text-white hover:bg-procreate-hover'
-                }`}
-              >
-                <Pencil size={18} />
-                {t('drawingTool.toolbar.pen')}
-              </button>
-              <button
-                onClick={() => {
-                  setDrawingMode('line');
-                  setIsEraser(false);
-                }}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all hover:scale-[0.98] active:scale-[0.98] ${
-                  drawingMode === 'line' && !isEraser
-                    ? 'bg-procreate-accent text-white shadow-md'
-                    : 'bg-procreate-bg text-white hover:bg-procreate-hover'
-                }`}
-              >
-                <Minus size={18} />
-                {t('drawingTool.toolbar.line')}
-              </button>
-              <button
-                onClick={() => {
-                  setDrawingMode('ellipse');
-                  setIsEraser(false);
-                }}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all hover:scale-[0.98] active:scale-[0.98] ${
-                  drawingMode === 'ellipse' && !isEraser
-                    ? 'bg-procreate-accent text-white shadow-md'
-                    : 'bg-procreate-bg text-white hover:bg-procreate-hover'
-                }`}
-              >
-                <Circle size={18} />
-                {t('drawingTool.toolbar.ellipse')}
-              </button>
-              <button
-                onClick={() => {
-                  setDrawingMode('pen');
-                  setIsEraser(true);
-                }}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all hover:scale-[0.98] active:scale-[0.98] ${
-                  isEraser
-                    ? 'bg-red-600 text-white shadow-md'
-                    : 'bg-procreate-bg text-white hover:bg-procreate-hover'
-                }`}
-              >
-                <Eraser size={18} />
-                {t('drawingTool.toolbar.eraser')}
-              </button>
-              <button
-                onClick={() => setShowGrid(!showGrid)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all hover:scale-[0.98] active:scale-[0.98] ${
-                  showGrid
-                    ? 'bg-procreate-accent text-white shadow-md'
-                    : 'bg-procreate-bg text-white hover:bg-procreate-hover'
-                }`}
-              >
-                <Grid size={18} />
-                {t('drawingTool.toolbar.grid')}
-              </button>
-              <button
-                onClick={clearCanvas}
-                className="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 hover:scale-[0.98] active:scale-[0.98] transition-all"
-              >
-                {t('drawingTool.toolbar.clearAll')}
-              </button>
-            </div>
-
-            {/* グリッド調整（グリッド表示中のみ） */}
-            {showGrid && (
-              <div className="flex flex-wrap items-center gap-6 bg-procreate-bg rounded-lg p-3">
-                {/* グリッドサイズ */}
-                <div className="flex items-center gap-3">
-                  <label className="text-sm font-semibold text-white">{t('drawingTool.toolbar.gridSize')}</label>
-                  <input
-                    type="range"
-                    min="2"
-                    max="8"
-                    value={gridSize}
-                    onChange={(e) => setGridSize(Number(e.target.value))}
-                    className="w-32"
-                  />
-                  <span className="text-sm text-gray-300 font-medium w-10">{gridSize}x{gridSize}</span>
-                </div>
-
-                {/* グリッドの濃さ */}
-                <div className="flex items-center gap-3">
-                  <label className="text-sm font-semibold text-white">{t('drawingTool.toolbar.gridOpacity')}</label>
-                  <input
-                    type="range"
-                    min="0.1"
-                    max="1"
-                    step="0.1"
-                    value={gridOpacity}
-                    onChange={(e) => setGridOpacity(Number(e.target.value))}
-                    className="w-32"
-                  />
-                  <span className="text-sm text-gray-300 font-medium w-10">{Math.round(gridOpacity * 100)}%</span>
-                </div>
-              </div>
-            )}
-
-            {/* ブラシ設定 */}
-            <div className="flex flex-wrap gap-6 items-center">
-              <div className="flex items-center gap-3">
-                <label className="text-sm font-semibold text-white">{t('drawingTool.toolbar.color')}</label>
-                <input
-                  type="color"
-                  value={brushColor}
-                  onChange={(e) => setBrushColor(e.target.value)}
-                  className="w-12 h-10 rounded cursor-pointer"
-                />
-              </div>
-              <div className="flex items-center gap-3">
-                <label className="text-sm font-semibold text-white">{t('drawingTool.toolbar.size')}</label>
-                <input
-                  type="range"
-                  min="1"
-                  max="20"
-                  value={brushSize}
-                  onChange={(e) => setBrushSize(Number(e.target.value))}
-                  className="w-32"
-                />
-                <span className="text-sm text-gray-300 w-8">{brushSize}</span>
-              </div>
-            </div>
-
-            {/* 保存・読み込み */}
-            <div className="border-t border-gray-600 pt-4 flex gap-3">
-              <button
-                onClick={downloadDrawing}
-                className="flex items-center gap-2 px-6 py-3 bg-procreate-accent text-white rounded-xl hover:bg-blue-600 hover:scale-[0.98] active:scale-[0.98] transition-all font-semibold"
-              >
-                <Download size={18} />
-                {t('drawingTool.toolbar.download')}
-              </button>
-            </div>
-          </div>
         </div>
 
         {/* バナー広告（練習画面最下部） */}
@@ -862,10 +706,216 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
         </footer>
       </div>
 
+      {/* 半モーダルドロワー */}
+      <div className={`fixed bottom-0 left-0 right-0 z-50 glass-card shadow-2xl rounded-t-3xl transition-transform duration-300 zoom-independent ${
+        isDrawerOpen ? 'translate-y-0' : 'translate-y-[calc(100%-4rem)]'
+      }`}>
+        <div className="w-full max-w-4xl mx-auto px-4">
+          <div className="py-3 overflow-y-auto">
+            {/* ドロワーハンドル */}
+            <div
+              className="flex justify-center mb-2 cursor-pointer py-3"
+              onClick={() => setIsDrawerOpen(!isDrawerOpen)}
+            >
+              <div className="w-12 h-1 bg-gray-500 rounded-full"></div>
+            </div>
+
+          {/* 描画ツール */}
+          <div className="flex flex-wrap gap-3 justify-center">
+            {/* ① Undo/Redo Group */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-3 shadow-sm hover:shadow-md transition-all duration-200 border border-white/10">
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={undo}
+                  disabled={historyStep <= 0}
+                  className="flex items-center justify-center p-1.5 bg-procreate-bg text-white rounded-xl hover:bg-procreate-hover transition-all disabled:opacity-50"
+                  title={t('drawingTool.toolbar.undo')}
+                >
+                  <Undo2 size={18} />
+                </button>
+                <button
+                  onClick={redo}
+                  disabled={historyStep >= history.length - 1}
+                  className="flex items-center justify-center p-1.5 bg-procreate-bg text-white rounded-xl hover:bg-procreate-hover transition-all disabled:opacity-50"
+                  title={t('drawingTool.toolbar.redo')}
+                >
+                  <Redo2 size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* ② Drawing Tools Group */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-3 shadow-sm hover:shadow-md transition-all duration-200 border border-white/10">
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => {
+                    setDrawingMode('pen');
+                    setIsEraser(false);
+                  }}
+                  className={`flex items-center justify-center p-1.5 text-white rounded-xl transition-all ${
+                    drawingMode === 'pen' && !isEraser
+                      ? 'bg-procreate-accent'
+                      : 'bg-procreate-bg hover:bg-procreate-hover'
+                  }`}
+                  title={t('drawingTool.toolbar.pen')}
+                >
+                  <Pencil size={18} />
+                </button>
+                <button
+                  onClick={() => {
+                    setDrawingMode('pen');
+                    setIsEraser(true);
+                  }}
+                  className={`flex items-center justify-center p-1.5 text-white rounded-xl transition-all ${
+                    isEraser
+                      ? 'bg-red-600'
+                      : 'bg-procreate-bg hover:bg-procreate-hover'
+                  }`}
+                  title={t('drawingTool.toolbar.eraser')}
+                >
+                  <Eraser size={18} />
+                </button>
+                <button
+                  onClick={() => {
+                    setDrawingMode('ellipse');
+                    setIsEraser(false);
+                  }}
+                  className={`flex items-center justify-center p-1.5 text-white rounded-xl transition-all ${
+                    drawingMode === 'ellipse' && !isEraser
+                      ? 'bg-procreate-accent'
+                      : 'bg-procreate-bg hover:bg-procreate-hover'
+                  }`}
+                  title={t('drawingTool.toolbar.ellipse')}
+                >
+                  <Circle size={18} />
+                </button>
+                <button
+                  onClick={() => {
+                    setDrawingMode('line');
+                    setIsEraser(false);
+                  }}
+                  className={`flex items-center justify-center p-1.5 text-white rounded-xl transition-all ${
+                    drawingMode === 'line' && !isEraser
+                      ? 'bg-procreate-accent'
+                      : 'bg-procreate-bg hover:bg-procreate-hover'
+                  }`}
+                  title={t('drawingTool.toolbar.line')}
+                >
+                  <Minus size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* ③ Clear All Group */}
+            <div className="bg-red-500/5 backdrop-blur-sm rounded-2xl p-3 shadow-sm hover:shadow-md transition-all duration-200 border border-red-500/20">
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={clearCanvas}
+                  className="col-span-2 flex items-center justify-center p-1.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all"
+                  title={t('drawingTool.toolbar.clearAll')}
+                >
+                  <Trash2 size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* ④ Grid Group */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-3 shadow-sm hover:shadow-md transition-all duration-200 border border-white/10">
+              <div className="grid grid-cols-1 gap-2">
+                {/* グリッドON/OFFボタン */}
+                <button
+                  onClick={() => setShowGrid(!showGrid)}
+                  className={`flex items-center justify-center p-1.5 text-white rounded-xl transition-all ${
+                    showGrid
+                      ? 'bg-procreate-accent'
+                      : 'bg-procreate-bg hover:bg-procreate-hover'
+                  }`}
+                  title={t('drawingTool.toolbar.grid')}
+                >
+                  <Grid size={18} />
+                </button>
+
+                {/* グリッド設定ボタン（スパナ） */}
+                <button
+                  onClick={() => setShowGridModal(true)}
+                  className="flex items-center justify-center p-1.5 text-white bg-procreate-bg rounded-xl hover:bg-procreate-hover transition-all"
+                  title="グリッド設定"
+                >
+                  <Settings size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* ⑤ Photo Switch Group */}
+            <div className="bg-blue-500/5 backdrop-blur-sm rounded-2xl p-3 shadow-sm hover:shadow-md transition-all duration-200 border border-blue-500/20">
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={changePhoto}
+                  className="col-span-2 flex items-center justify-center p-1.5 bg-procreate-tag text-white rounded-xl hover:bg-procreate-hover transition-all"
+                  title={t('drawingTool.changePhoto')}
+                >
+                  <RefreshCw size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* ⑥ Download Group */}
+            <div className="bg-blue-500/5 backdrop-blur-sm rounded-2xl p-3 shadow-sm hover:shadow-md transition-all duration-200 border border-blue-500/20">
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={downloadDrawing}
+                  className="col-span-2 flex items-center justify-center p-1.5 bg-procreate-accent text-white rounded-xl hover:bg-blue-600 transition-all"
+                  title={t('drawingTool.toolbar.download')}
+                >
+                  <Download size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* ⑦ Color & Size Control Group */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-3 shadow-sm hover:shadow-md transition-all duration-200 border border-white/10">
+              <div className="flex items-center gap-4">
+                {/* Color Picker */}
+                <div className="flex items-center gap-2">
+                  <label className="text-sm text-white">{t('drawingTool.toolbar.color')}</label>
+                  <input
+                    type="color"
+                    value={brushColor}
+                    onChange={(e) => setBrushColor(e.target.value)}
+                    className="w-10 h-10 rounded cursor-pointer"
+                  />
+                </div>
+
+                {/* Size Slider */}
+                <div className="flex-1 flex items-center gap-2">
+                  <label className="text-sm text-white">{t('drawingTool.toolbar.size')}</label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="20"
+                    value={brushSize}
+                    onChange={(e) => setBrushSize(Number(e.target.value))}
+                    className="flex-1"
+                  />
+                  <span className="text-sm text-gray-300 w-8">{brushSize}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+
       {/* Stepヘルプモーダル */}
       {showStepHelpModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="glass-card rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+          onClick={() => setShowStepHelpModal(false)}
+        >
+          <div
+            className="glass-card rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold text-white">Stepとは？</h3>
               <button
@@ -903,6 +953,65 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
                 className="w-full rounded-lg border border-gray-600"
               />
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* グリッド設定モーダル */}
+      {showGridModal && (
+        <div
+          className="fixed inset-0 flex items-center justify-center z-50"
+          onClick={() => setShowGridModal(false)}
+        >
+          <div
+            className="glass-card-opaque rounded-2xl p-6 w-full mx-4 max-w-sm"
+            onClick={(e) => e.stopPropagation()}
+          >
+          {/* タイトルと閉じ方の説明 */}
+          <div className="mb-4">
+            <h3 className="text-lg font-bold text-white mb-1">グリッド設定</h3>
+            <p className="text-xs text-gray-400">画面外をタップして閉じる</p>
+          </div>
+
+          {/* グリッド調整スライダー */}
+          <div className="space-y-3">
+            {/* グリッドサイズ */}
+            <div className="bg-procreate-bg rounded-lg p-3">
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-semibold text-white">
+                  {t('drawingTool.toolbar.gridSize')}
+                </label>
+                <span className="text-sm text-gray-300">{gridSize}x{gridSize}</span>
+              </div>
+              <input
+                type="range"
+                min="2"
+                max="8"
+                value={gridSize}
+                onChange={(e) => setGridSize(Number(e.target.value))}
+                className="w-full"
+              />
+            </div>
+
+            {/* グリッド濃さ */}
+            <div className="bg-procreate-bg rounded-lg p-3">
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-semibold text-white">
+                  {t('drawingTool.toolbar.gridOpacity')}
+                </label>
+                <span className="text-sm text-gray-300">{Math.round(gridOpacity * 100)}%</span>
+              </div>
+              <input
+                type="range"
+                min="0.1"
+                max="1"
+                step="0.1"
+                value={gridOpacity}
+                onChange={(e) => setGridOpacity(Number(e.target.value))}
+                className="w-full"
+              />
+            </div>
+          </div>
           </div>
         </div>
       )}

@@ -35,7 +35,15 @@
       "deleteFolder": "フォルダを削除",
       "deleteConfirm": "このフォルダを削除しますか？\nフォルダ内の写真は「全て」に移動されます。",
       "createPrompt": "新しいフォルダ名を入力してください",
-      "createError": "フォルダ名を入力してください"
+      "createError": "フォルダ名を入力してください",
+      "deleteFolderModal": {
+        "title": "フォルダを削除",
+        "confirmMessage": "フォルダ「{{folderName}}」を削除しますか？",
+        "photoCount": "このフォルダには {{count}} 枚の写真があります",
+        "deletePhotosCheckbox": "写真も一緒に削除する",
+        "warningDelete": "⚠️ フォルダと写真が完全に削除されます（復元できません）",
+        "warningKeep": "📂 写真は「全て」に移動します（削除されません）"
+      }
     },
     "management": {
       "addPhoto": "写真を追加",
@@ -127,6 +135,12 @@
       "gridOpacity": "グリッドの濃さ:",
       "color": "色:",
       "size": "サイズ:",
+      "drawingMode": "描画モード",
+      "brushSettings": "ブラシ設定",
+      "canvasActions": "キャンバス操作",
+      "gridSettings": "グリッド調整",
+      "openTools": "ツールを開く",
+      "closeTools": "ツールを閉じる",
       "download": "画像をダウンロード"
     }
   },
@@ -205,5 +219,49 @@
     "successMessage": "お問い合わせありがとうございます。できるだけ早くご返信いたします。",
     "errorTitle": "送信エラー",
     "errorMessage": "送信に失敗しました。もう一度お試しください。"
+  },
+  "templateStore": {
+    "title": "テンプレート購入",
+    "description": "プロ品質の写真パックで練習の幅を広げよう",
+    "backToApp": "アプリに戻る",
+    "categories": {
+      "all": "全て",
+      "portrait": "顔",
+      "hand": "手",
+      "pose": "ポーズ",
+      "animal": "動物",
+      "object": "物"
+    },
+    "packCard": {
+      "free": "無料",
+      "photoCount": "{{count}}枚の写真",
+      "purchased": "購入済み",
+      "purchase": "購入する",
+      "download": "ダウンロード",
+      "viewDetails": "詳細を見る",
+      "downloading": "ダウンロード中...",
+      "installSuccess": "パックをインストールしました！",
+      "installError": "インストールに失敗しました"
+    },
+    "emptyState": {
+      "title": "パックが見つかりません",
+      "description": "このカテゴリーにはまだパックがありません"
+    },
+    "purchaseSuccess": {
+      "title": "購入ありがとうございます！",
+      "message": "「{{packName}}」を購入しました",
+      "downloadInstructions": "下のボタンからパックをダウンロードして、写真管理画面でインポートしてください",
+      "downloadButton": "パックをダウンロード",
+      "importButton": "写真管理画面を開く",
+      "backupReminder": "💡 ダウンロードしたJSONファイルは大切に保管してください。いつでも再インポート可能です。"
+    },
+    "purchaseError": {
+      "title": "購入エラー",
+      "message": "購入処理に失敗しました。もう一度お試しください。",
+      "backButton": "ストアに戻る"
+    },
+    "loading": "パックを読み込み中...",
+    "loadError": "読み込みエラー",
+    "loadErrorDescription": "パック情報の読み込みに失敗しました"
   }
 }

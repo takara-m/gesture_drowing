@@ -35,7 +35,15 @@
       "deleteFolder": "Delete Folder",
       "deleteConfirm": "Delete this folder?\nPhotos in this folder will be moved to 'All Photos'.",
       "createPrompt": "Enter new folder name",
-      "createError": "Please enter a folder name"
+      "createError": "Please enter a folder name",
+      "deleteFolderModal": {
+        "title": "Delete Folder",
+        "confirmMessage": "Delete folder \"{{folderName}}\"?",
+        "photoCount": "This folder contains {{count}} photo(s)",
+        "deletePhotosCheckbox": "Also delete photos",
+        "warningDelete": "⚠️ Folder and photos will be permanently deleted (cannot be recovered)",
+        "warningKeep": "📂 Photos will be moved to \"All Photos\" (not deleted)"
+      }
     },
     "management": {
       "addPhoto": "Add Photo",
@@ -127,6 +135,12 @@
       "gridOpacity": "Grid Opacity:",
       "color": "Color:",
       "size": "Size:",
+      "drawingMode": "Drawing Mode",
+      "brushSettings": "Brush Settings",
+      "canvasActions": "Canvas Actions",
+      "gridSettings": "Grid Settings",
+      "openTools": "Open Tools",
+      "closeTools": "Close Tools",
       "download": "Download Image"
     }
   },
@@ -205,5 +219,49 @@
     "successMessage": "Thank you for contacting us. We will reply as soon as possible.",
     "errorTitle": "Send Error",
     "errorMessage": "Failed to send. Please try again."
+  },
+  "templateStore": {
+    "title": "Template Store",
+    "description": "Expand your practice with professional quality photo packs",
+    "backToApp": "Back to App",
+    "categories": {
+      "all": "All",
+      "portrait": "Face",
+      "hand": "Hand",
+      "pose": "Pose",
+      "animal": "Animal",
+      "object": "Object"
+    },
+    "packCard": {
+      "free": "Free",
+      "photoCount": "{{count}} photos",
+      "purchased": "Purchased",
+      "purchase": "Purchase",
+      "download": "Download",
+      "viewDetails": "View Details",
+      "downloading": "Downloading...",
+      "installSuccess": "Pack installed successfully!",
+      "installError": "Installation failed"
+    },
+    "emptyState": {
+      "title": "No packs found",
+      "description": "There are no packs in this category yet"
+    },
+    "purchaseSuccess": {
+      "title": "Thank you for your purchase!",
+      "message": "You purchased \"{{packName}}\"",
+      "downloadInstructions": "Download the pack using the button below, then import it in the photo management screen",
+      "downloadButton": "Download Pack",
+      "importButton": "Open Photo Manager",
+      "backupReminder": "💡 Keep the downloaded JSON file safe. You can re-import it anytime."
+    },
+    "purchaseError": {
+      "title": "Purchase Error",
+      "message": "Purchase failed. Please try again.",
+      "backButton": "Back to Store"
+    },
+    "loading": "Loading packs...",
+    "loadError": "Load Error",
+    "loadErrorDescription": "Failed to load pack information"
   }
 }

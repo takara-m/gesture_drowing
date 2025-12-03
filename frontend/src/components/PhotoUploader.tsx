@@ -116,16 +116,6 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({ onUploadComplete, 
     });
   };
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    const files = Array.from(e.dataTransfer.files);
-    handleFiles(files);
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
   const removeFile = (index: number) => {
     setSelectedFiles(prev => prev.filter((_, i) => i !== index));
     setPreviews(prev => prev.filter((_, i) => i !== index));
@@ -178,7 +168,7 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({ onUploadComplete, 
   };
 
   return (
-    <div className="bg-procreate-card rounded-lg shadow-lg p-6 w-full max-w-2xl">
+    <div className="bg-procreate-card rounded-lg shadow-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold text-white">{t('photoUploader.title')}</h2>
         {onClose && (
@@ -210,18 +200,16 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({ onUploadComplete, 
         </select>
       </div>
 
-      {/* ドラッグ&ドロップエリア */}
+      {/* クリック選択エリア */}
       <div
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
-        className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center bg-procreate-bg hover:border-procreate-accent transition-colors cursor-pointer"
+        className="border-2 border-dashed border-gray-600 rounded-lg p-4 text-center bg-procreate-bg hover:border-procreate-accent transition-colors cursor-pointer"
         onClick={() => fileInputRef.current?.click()}
       >
-        <Upload size={48} className="mx-auto mb-4 text-gray-300" />
-        <p className="text-white mb-2">
-          クリックして写真を選択、またはドラッグ&ドロップ
+        <Upload size={32} className="mx-auto mb-2 text-gray-300" />
+        <p className="text-white text-sm mb-1">
+          クリックして写真を選択
         </p>
-        <p className="text-sm text-gray-300">
+        <p className="text-xs text-gray-300">
           JPG, PNG, WEBP対応 / 複数選択可能
         </p>
       </div>

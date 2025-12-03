@@ -22,10 +22,15 @@ export const AdBanner: React.FC<AdBannerProps> = ({
   useEffect(() => {
     try {
       // AdSenseが読み込まれているか確認
-      if (typeof window !== 'undefined' && window.adsbygoogle) {
-        // 広告を初期化
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
-        console.log(`[AdBanner] Ad initialized for slot: ${slot}`);
+      if (typeof window !== 'undefined' && window.adsbygoogle && adRef.current) {
+        // 既に広告が初期化されているか確認
+        const isAlreadyInitialized = adRef.current.getAttribute('data-adsbygoogle-status');
+
+        if (!isAlreadyInitialized) {
+          // 広告を初期化
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+          console.log(`[AdBanner] Ad initialized for slot: ${slot}`);
+        }
       }
     } catch (error) {
       console.error('[AdBanner] Error initializing ad:', error);
@@ -33,7 +38,7 @@ export const AdBanner: React.FC<AdBannerProps> = ({
   }, [slot]);
 
   return (
-    <div className={`ad-banner-container my-6 flex justify-center ${className}`}>
+    <div className={`ad-banner-container flex justify-center ${className}`}>
       <ins
         ref={adRef}
         className="adsbygoogle"

@@ -33,18 +33,29 @@ export const createFolder = async (name: string): Promise<Folder> => {
 
 /**
  * フォルダを削除
- * 注意: フォルダ内の写真のfolderIdはnullに設定される
+ * @param folderId - 削除するフォルダID
+ * @param deletePhotos - trueの場合は写真も削除、falseの場合は写真をrootに移動（デフォルト: false）
  */
-export const deleteFolder = async (folderId: string): Promise<void> => {
-  // フォルダ内の写真のfolderIdをnullに設定
+export const deleteFolder = async (folderId: string, deletePhotos: boolean = false): Promise<void> => {
+  // フォルダ内の写真を取得
   const photos = await db.photos.where('folderId').equals(folderId).toArray();
-  for (const photo of photos) {
-    await db.photos.update(photo.id!, { folderId: null });
+
+  if (deletePhotos) {
+    // 写真も削除
+    for (const photo of photos) {
+      await db.photos.delete(photo.id!);
+    }
+    console.log(`[folderService] Folder deleted: ${folderId}, ${photos.length} photos deleted`);
+  } else {
+    // 写真のfolderIdをnullに設定（「全て」に移動）
+    for (const photo of photos) {
+      await db.photos.update(photo.id!, { folderId: null });
+    }
+    console.log(`[folderService] Folder deleted: ${folderId}, ${photos.length} photos moved to root`);
   }
 
   // フォルダを削除
   await db.folders.delete(folderId);
-  console.log(`[folderService] Folder deleted: ${folderId}, ${photos.length} photos moved to root`);
 };
 
 /**

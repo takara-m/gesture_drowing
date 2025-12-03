@@ -14,7 +14,9 @@
       "WebFetch(domain:hilltopads.com)",
       "WebFetch(domain:pomodoro.lit-gallery.com)",
       "Bash(cd:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(/tmp/layout-changes.patch)",
+      "Bash(git restore:*)"
     ],
     "deny": [],
     "ask": []

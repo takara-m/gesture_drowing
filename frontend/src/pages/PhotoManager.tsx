@@ -7,7 +7,6 @@ import { useLanguage } from '../contexts/LanguageContext';
 import type { Photo, Folder } from '../services/db';
 import { getPhotoByOrder, exportPhotosToJSON, importPhotosFromJSON } from '../services/photoService';
 import { getAllFolders, createFolder, deleteFolder, getPhotoCountInFolder } from '../services/folderService';
-import { AnimatedLogo } from '../components/AnimatedLogo';
 import { AdBanner } from '../components/ads';
 
 interface PhotoManagerProps {
@@ -28,6 +27,8 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
   const [practiceFolderId, setPracticeFolderId] = useState<string | null>(null); // 練習用フォルダ選択
   const [folderPhotoCounts, setFolderPhotoCounts] = useState<Map<string | null, number>>(new Map());
   const [showFolderHelpModal, setShowFolderHelpModal] = useState(false); // フォルダヘルプモーダル
+  const [showDeleteFolderModal, setShowDeleteFolderModal] = useState(false); // フォルダ削除モーダル
+  const [deleteFolderWithPhotos, setDeleteFolderWithPhotos] = useState(false); // 写真も削除するかどうか
 
   // フォルダリストを読み込み
   useEffect(() => {
@@ -101,22 +102,40 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
 
   // フォルダ削除
   const handleDeleteFolder = async (folderId: string) => {
-    if (!confirm(t('photoManager.folders.deleteConfirm'))) {
-      return;
-    }
+    // フォルダを選択してモーダルを表示
+    setSelectedFolderId(folderId);
+    setShowDeleteFolderModal(true);
+  };
 
-    await deleteFolder(folderId);
+  // フォルダ削除確定
+  const confirmDeleteFolder = async () => {
+    if (!selectedFolderId) return;
 
-    // 削除したフォルダが選択中だった場合は「全て」に戻す
-    if (selectedFolderId === folderId) {
+    try {
+      // チェックボックスの状態に応じて削除
+      await deleteFolder(selectedFolderId, deleteFolderWithPhotos);
+
+      // 削除したフォルダが練習用フォルダだった場合は「全て」に戻す
+      if (practiceFolderId === selectedFolderId) {
+        setPracticeFolderId(null);
+      }
+
+      // モーダルを閉じてリセット
+      setShowDeleteFolderModal(false);
+      setDeleteFolderWithPhotos(false);
       setSelectedFolderId(null);
-    }
-    if (practiceFolderId === folderId) {
-      setPracticeFolderId(null);
-    }
 
-    await loadFolders();
-    setGridKey(prev => prev + 1); // グリッドを更新
+      await loadFolders();
+      setGridKey(prev => prev + 1); // グリッドを更新
+    } catch (error) {
+      console.error('Failed to delete folder:', error);
+    }
+  };
+
+  // フォルダ削除キャンセル
+  const cancelDeleteFolder = () => {
+    setShowDeleteFolderModal(false);
+    setDeleteFolderWithPhotos(false);
   };
 
   // バックアップ機能
@@ -185,103 +204,107 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
 
   return (
     <div className="min-h-screen p-6">
-      {/* ロゴセクション（最上部・中央寄せ・レスポンシブ） */}
-      <div className="flex justify-center mb-8">
-        <AnimatedLogo />
-      </div>
-
-      {/* バナー広告（ロゴ下） */}
+      {/* バナー広告（最上部） */}
       <AdBanner slot="1234567890" format="auto" responsive={true} />
 
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* ①練習開始セクション（Heroレイアウト） */}
-        <div className="glass-card rounded-lg shadow-md p-8 relative">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* 左側：練習開始フォーム */}
-            <div className="flex flex-col">
-              <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-                <Play size={28} className="text-procreate-accent" />
-                {t('photoManager.practiceStart.title')}
-              </h2>
-              <p className="text-sm text-gray-300 mb-4 text-center">
-                {t('photoManager.practiceStart.description')}
+        {/* ①練習開始セクション（HEROセクション） */}
+        <div className="hero-section rounded-lg shadow-md relative min-h-[500px] flex items-center justify-center overflow-hidden">
+          {/* GIF背景（右側） */}
+          <div className="hero-background">
+            <img
+              src="/assets/Animation6.gif"
+              alt="背景"
+              className="hero-gif"
+            />
+          </div>
+
+          {/* 左側画像 */}
+          <div className="hero-left-image">
+            <img
+              src="/assets/hero-coffee.gif"
+              alt="装飾"
+              className="hero-coffee"
+            />
+          </div>
+
+          {/* コンテンツエリア */}
+          <div className="hero-content relative z-10 w-full px-8 py-12 flex flex-col items-start text-left space-y-6">
+            {/* タイトル: Gesdro! ジェスチャードローイングアプリ */}
+            <div className="flex flex-col items-start">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white drop-shadow-lg mb-2">
+                Gesdro!
+              </h1>
+              <p className="text-lg md:text-xl font-medium text-white drop-shadow-md">
+                ジェスチャードローイングアプリ
               </p>
-
-              {/* フォルダ選択 */}
-              <div className="mb-4 flex flex-col items-center">
-                <label className="block text-sm font-medium text-white mb-2 text-center">
-                  {t('photoManager.practiceStart.folder')}
-                </label>
-                <select
-                  value={practiceFolderId || ''}
-                  onChange={(e) => setPracticeFolderId(e.target.value || null)}
-                  className="w-full max-w-xs px-4 py-2 bg-procreate-bg text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-procreate-accent focus:border-transparent"
-                >
-                  <option className="bg-white text-gray-900" value="">{t('photoManager.practiceStart.allPhotos')} ({folderPhotoCounts.get(null) || 0})</option>
-                  {folders.map(folder => (
-                    <option className="bg-white text-gray-900" key={folder.id} value={folder.id}>
-                      {folder.name} ({folderPhotoCounts.get(folder.id) || 0})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* 順序選択 */}
-              <div className="flex flex-wrap justify-center gap-3 mb-4">
-                <button
-                  onClick={() => setSelectedOrder('oldest')}
-                  className={`neuro-button px-3 py-2 font-semibold transition-all hover:scale-[0.98] active:scale-[0.98] text-white ${
-                    selectedOrder === 'oldest' ? 'selected' : ''
-                  }`}
-                >
-                  {t('photoManager.practiceStart.oldest')}
-                </button>
-                <button
-                  onClick={() => setSelectedOrder('newest')}
-                  className={`neuro-button px-3 py-2 font-semibold transition-all hover:scale-[0.98] active:scale-[0.98] text-white ${
-                    selectedOrder === 'newest' ? 'selected' : ''
-                  }`}
-                >
-                  {t('photoManager.practiceStart.newest')}
-                </button>
-                <button
-                  onClick={() => setSelectedOrder('random')}
-                  className={`neuro-button px-3 py-2 font-semibold transition-all hover:scale-[0.98] active:scale-[0.98] text-white ${
-                    selectedOrder === 'random' ? 'selected' : ''
-                  }`}
-                >
-                  {t('photoManager.practiceStart.random')}
-                </button>
-              </div>
-
-              {/* 開始ボタン */}
-              <div className="flex justify-center mb-6">
-                <button
-                  onClick={handleStartPractice}
-                  className="start-button w-full max-w-xs flex items-center justify-center gap-2 px-8 py-3 text-white hover:scale-[0.98] active:scale-[0.98] transition-all font-bold text-lg"
-                >
-                  <Play size={24} />
-                  {t('photoManager.practiceStart.startButton')}
-                </button>
-              </div>
-
-              {/* キャッチコピー */}
-              <div className="flex-1 flex items-center justify-center text-center border-t border-gray-600 pt-4">
-                <p className="text-gray-300 text-sm leading-relaxed">
-                  {t('photoManager.practiceStart.catchphrase1')}<br />
-                  {t('photoManager.practiceStart.catchphrase2')}<br />
-                  <span className="text-procreate-accent font-semibold">{t('photoManager.practiceStart.catchphrase3')}</span>
-                </p>
-              </div>
             </div>
 
-            {/* 右側：使い方GIF */}
-            <div className="flex items-center justify-center">
-              <img
-                src="/assets/Animation6.gif"
-                alt="使い方"
-                className="w-full h-auto max-h-[400px] object-contain rounded-lg"
-              />
+            {/* キャッチコピー */}
+            <div className="text-white text-base md:text-lg leading-relaxed drop-shadow-md">
+              <p>{t('photoManager.practiceStart.catchphrase1')}</p>
+              <p>{t('photoManager.practiceStart.catchphrase2')}</p>
+              <p className="text-procreate-accent font-semibold text-lg md:text-xl mt-2">
+                {t('photoManager.practiceStart.catchphrase3')}
+              </p>
+            </div>
+
+            {/* 開始ボタン */}
+            <div className="flex justify-start w-full">
+              <button
+                onClick={handleStartPractice}
+                className="start-button w-full max-w-xs flex items-center justify-center gap-2 px-8 py-3 text-white hover:scale-[0.98] active:scale-[0.98] transition-all font-bold text-lg"
+              >
+                <Play size={24} />
+                {t('photoManager.practiceStart.startButton')}
+              </button>
+            </div>
+
+            {/* 順序選択 */}
+            <div className="flex flex-wrap justify-start gap-3">
+              <button
+                onClick={() => setSelectedOrder('oldest')}
+                className={`neuro-button px-4 py-2 font-semibold transition-all hover:scale-[0.98] active:scale-[0.98] text-white ${
+                  selectedOrder === 'oldest' ? 'selected' : ''
+                }`}
+              >
+                {t('photoManager.practiceStart.oldest')}
+              </button>
+              <button
+                onClick={() => setSelectedOrder('newest')}
+                className={`neuro-button px-4 py-2 font-semibold transition-all hover:scale-[0.98] active:scale-[0.98] text-white ${
+                  selectedOrder === 'newest' ? 'selected' : ''
+                }`}
+              >
+                {t('photoManager.practiceStart.newest')}
+              </button>
+              <button
+                onClick={() => setSelectedOrder('random')}
+                className={`neuro-button px-4 py-2 font-semibold transition-all hover:scale-[0.98] active:scale-[0.98] text-white ${
+                  selectedOrder === 'random' ? 'selected' : ''
+                }`}
+              >
+                {t('photoManager.practiceStart.random')}
+              </button>
+            </div>
+
+            {/* フォルダ選択 */}
+            <div className="w-full max-w-xs">
+              <label className="block text-sm font-medium text-white mb-2 drop-shadow-md">
+                {t('photoManager.practiceStart.folder')}
+              </label>
+              <select
+                value={practiceFolderId || ''}
+                onChange={(e) => setPracticeFolderId(e.target.value || null)}
+                className="w-full px-4 py-2 bg-procreate-bg text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-procreate-accent focus:border-transparent"
+              >
+                <option className="bg-white text-gray-900" value="">{t('photoManager.practiceStart.allPhotos')} ({folderPhotoCounts.get(null) || 0})</option>
+                {folders.map(folder => (
+                  <option className="bg-white text-gray-900" key={folder.id} value={folder.id}>
+                    {folder.name} ({folderPhotoCounts.get(folder.id) || 0})
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         </div>
@@ -455,8 +478,14 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
 
         {/* フォルダヘルプモーダル */}
         {showFolderHelpModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="glass-card rounded-2xl p-6 max-w-md w-full">
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+            onClick={() => setShowFolderHelpModal(false)}
+          >
+            <div
+              className="glass-card rounded-2xl p-6 max-w-md w-full"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold text-white">フォルダとは？</h3>
                 <button
@@ -475,6 +504,73 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
                 alt="フォルダの使い方"
                 className="w-full rounded-lg border border-gray-600"
               />
+            </div>
+          </div>
+        )}
+
+        {/* フォルダ削除確認モーダル */}
+        {showDeleteFolderModal && selectedFolderId && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+            onClick={cancelDeleteFolder}
+          >
+            <div
+              className="glass-card-opaque rounded-2xl p-6 w-full max-w-md shadow-2xl border border-white/20"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* タイトル */}
+              <h3 className="text-xl font-bold text-white mb-4">
+                {t('photoManager.folders.deleteFolderModal.title')}
+              </h3>
+
+              {/* フォルダ情報 */}
+              <div className="mb-6">
+                <p className="text-white mb-2">
+                  {t('photoManager.folders.deleteFolderModal.confirmMessage', {
+                    folderName: folders.find(f => f.id === selectedFolderId)?.name || ''
+                  })}
+                </p>
+                <p className="text-sm text-gray-300">
+                  {t('photoManager.folders.deleteFolderModal.photoCount', {
+                    count: folderPhotoCounts.get(selectedFolderId) || 0
+                  })}
+                </p>
+              </div>
+
+              {/* チェックボックス */}
+              <label className="flex items-center gap-3 mb-6 p-3 bg-white/5 rounded-xl border border-white/10 cursor-pointer hover:bg-white/10 transition-all">
+                <input
+                  type="checkbox"
+                  checked={deleteFolderWithPhotos}
+                  onChange={(e) => setDeleteFolderWithPhotos(e.target.checked)}
+                  className="w-5 h-5 rounded cursor-pointer"
+                />
+                <span className="text-white">{t('photoManager.folders.deleteFolderModal.deletePhotosCheckbox')}</span>
+              </label>
+
+              {/* 説明テキスト */}
+              <p className="text-xs text-gray-400 mb-6">
+                {deleteFolderWithPhotos
+                  ? t('photoManager.folders.deleteFolderModal.warningDelete')
+                  : t('photoManager.folders.deleteFolderModal.warningKeep')
+                }
+              </p>
+
+              {/* アクションボタン */}
+              <div className="flex gap-3">
+                <button
+                  onClick={cancelDeleteFolder}
+                  className="flex-1 px-4 py-3 bg-white/5 backdrop-blur-sm text-white rounded-2xl border border-white/10 shadow-sm hover:shadow-md transition-all duration-200"
+                >
+                  {t('common.cancel')}
+                </button>
+                <button
+                  onClick={confirmDeleteFolder}
+                  className="flex-1 px-4 py-3 bg-red-500/90 backdrop-blur-sm text-white rounded-2xl border border-red-400/30 shadow-sm hover:shadow-md hover:bg-red-600/90 transition-all duration-200"
+                >
+                  {t('common.delete')}
+                </button>
+              </div>
             </div>
           </div>
         )}

@@ -6,6 +6,8 @@ import GesdroApp from './pages/GesdroApp'
 import Contact from './pages/Contact'
 import Privacy from './pages/Privacy'
 import BlogArticle from './pages/blog/BlogArticle'
+import { TemplateStore } from './pages/TemplateStore'
+import { TemplateStoreSuccess } from './pages/TemplateStoreSuccess'
 import './App.css'
 
 function App() {
@@ -17,6 +19,8 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/gesdro" element={<GesdroApp />} />
             <Route path="/gesdro/*" element={<GesdroApp />} />
+            <Route path="/templates" element={<TemplateStore />} />
+            <Route path="/templates/success" element={<TemplateStoreSuccess />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/blog/:slug" element={<BlogArticle />} />

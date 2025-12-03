@@ -1,0 +1,85 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2025-12-02T00:00:00Z",
+  "packs": [
+    {
+      "id": "pack-free-basic",
+      "name": {
+        "ja": "無料スターターパック",
+        "en": "Free Starter Pack"
+      },
+      "description": {
+        "ja": "初心者向けの基本的な顔写真9枚（既にインストール済み）",
+        "en": "9 basic face photos for beginners (already installed)"
+      },
+      "category": "portrait",
+      "price": 0,
+      "photoCount": 9,
+      "thumbnailUrl": "/assets/template/Close-Up Portrait.png",
+      "previewImages": [
+        "/assets/template/Close-Up Portrait.png",
+        "/assets/template/japanese idol women.jpg"
+      ],
+      "isFree": true,
+      "stripeProductId": "",
+      "stripePriceId": ""
+    },
+    {
+      "id": "pack-portrait-pro",
+      "name": {
+        "ja": "プロポートレートパック",
+        "en": "Pro Portrait Pack"
+      },
+      "description": {
+        "ja": "プロ撮影の高品質ポートレート15枚",
+        "en": "15 professional portrait photos"
+      },
+      "category": "portrait",
+      "price": 300,
+      "photoCount": 15,
+      "thumbnailUrl": "/assets/template/Close-Up Portrait.png",
+      "previewImages": [],
+      "isFree": false,
+      "stripeProductId": "prod_TXAz9yWN23dw4G",
+      "stripePriceId": "price_1Sa6dTECl1bhpZb4TkugjCyL"
+    },
+    {
+      "id": "pack-pose-dynamic",
+      "name": {
+        "ja": "ダイナミックポーズパック",
+        "en": "Dynamic Pose Pack"
+      },
+      "description": {
+        "ja": "躍動感あふれるポーズ写真20枚",
+        "en": "20 dynamic pose reference photos"
+      },
+      "category": "pose",
+      "price": 500,
+      "photoCount": 20,
+      "thumbnailUrl": "/assets/template/Portrait Profile View.png",
+      "previewImages": [],
+      "isFree": false,
+      "stripeProductId": "prod_TXB06zLPXV6jl9",
+      "stripePriceId": "price_1Sa6e7ECl1bhpZb4Ia0Y8tLK"
+    },
+    {
+      "id": "pack-Woman-vol1",
+      "name": {
+        "ja": "女性（ボリューム1）",
+        "en": "Woman-volume1"
+      },
+      "description": {
+        "ja": "女性の様々な向きの顔 100枚",
+        "en": "100 Photos of Women's Faces in Various Positions"
+      },
+      "category": "portrait",
+      "price": 300,
+      "photoCount": 29,
+      "thumbnailUrl": "/assets/template/pose_6_An_ethereal_close_up_of_a_Japa.jpg",
+      "previewImages": [],
+      "isFree": false,
+      "stripeProductId": "prod_TXAwhmWT1JfnTa",
+      "stripePriceId": "price_1Sa6aYECl1bhpZb4eqEv4E03"
+    }
+  ]
+}
