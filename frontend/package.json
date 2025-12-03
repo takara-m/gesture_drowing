@@ -15,6 +15,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@stripe/stripe-js": "^8.5.3",
     "dexie": "^4.2.1",
     "file-saver": "^2.0.5",
     "jszip": "^3.10.1",
