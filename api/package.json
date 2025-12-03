@@ -1,0 +1,16 @@
+{
+  "name": "gesdro-api",
+  "version": "1.0.0",
+  "description": "Vercel Serverless Functions for Gesdro! Template Store",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@vercel/node": "^3.0.0",
+    "stripe": "^17.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
+  }
+}
