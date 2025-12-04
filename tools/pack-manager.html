@@ -606,7 +606,7 @@
       <h2>2.6 プレビュー画像専用アップロード（推奨）</h2>
       <p class="info">
         <strong>💡 新機能:</strong> プレビュー画像9枚を直接ドラッグ&ドロップできます。<br>
-        ZIPファイルでダウンロードし、指定フォルダに配置するだけで完了します。<br>
+        ZIPダウンロード時にサムネイルも自動的に含まれるため、手動コピー不要です。<br>
         ※ セクション2.5（チェックボックス選択）よりもこちらの方法を推奨します。
       </p>
 
@@ -637,10 +637,9 @@
       <div class="zip-guide" id="zipGuide" style="display: none;">
         <h4>📁 ZIPダウンロード後の配置手順</h4>
         <ol>
-          <li>ダウンロードした <code>{pack-id}-previews.zip</code> を解凍</li>
+          <li>ダウンロードした <code>{pack-id}-previews.zip</code> を解凍（10枚: プレビュー9枚+サムネイル1枚）</li>
           <li>解凍したフォルダ（<code>{pack-id}</code>）を <code>frontend/public/assets/template/</code> にコピー</li>
-          <li>サムネイル画像も同じフォルダにコピー</li>
-          <li>JSONを生成して完了</li>
+          <li>JSONを生成して完了 ✨ サムネイルのコピーは不要！</li>
         </ol>
       </div>
     </section>
@@ -675,11 +674,10 @@
         <li>パック用JSONをダウンロードして <code>frontend/public/data/packs/</code> フォルダに配置</li>
         <li><strong>【重要】</strong> 画像ファイルの配置:
           <ul>
-            <li>セクション2.6使用時: 「ZIPダウンロード」をクリック → 解凍 → フォルダごと <code>frontend/public/assets/template/</code> にコピー</li>
-            <li>セクション2.5使用時: 選択した9枚の画像を手動で <code>frontend/public/assets/template/{pack-id}/</code> にコピー</li>
+            <li>セクション2.6使用時: 「ZIPダウンロード」をクリック（プレビュー9枚+サムネイル1枚=10枚） → 解凍 → フォルダごと <code>frontend/public/assets/template/</code> にコピー</li>
+            <li>セクション2.5使用時: 選択した9枚の画像とサムネイルを手動で <code>frontend/public/assets/template/{pack-id}/</code> にコピー</li>
           </ul>
         </li>
-        <li>サムネイル画像も <code>frontend/public/assets/template/{pack-id}/</code> にコピー</li>
       </ol>
 
       <h3 style="margin-top: 1.5rem; color: #667eea;">📁 最終的なフォルダ構造</h3>
@@ -1128,12 +1126,19 @@
         return;
       }
 
+      // サムネイル選択チェック
+      if (selectedThumbnailIndex === undefined || uploadedPhotos.length === 0) {
+        alert('❌ サムネイル画像が選択されていません。\n\nセクション2で写真をアップロードし、サムネイルを1枚選択してください。');
+        document.getElementById('photoPreview').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
       try {
         // JSZipインスタンス作成
         const zip = new JSZip();
         const folder = zip.folder(packId);
 
-        // 9枚の画像をZIPに追加
+        // 9枚のプレビュー画像をZIPに追加
         for (let i = 0; i < previewOnlyPhotos.length; i++) {
           const photo = previewOnlyPhotos[i];
 
@@ -1144,6 +1149,12 @@
           // ファイルをフォルダに追加
           folder.file(photo.filename, blob);
         }
+
+        // サムネイル画像もZIPに追加
+        const thumbnailPhoto = uploadedPhotos[selectedThumbnailIndex];
+        const thumbnailResponse = await fetch(thumbnailPhoto.dataUrl);
+        const thumbnailBlob = await thumbnailResponse.blob();
+        folder.file(thumbnailPhoto.filename, thumbnailBlob);
 
         // ZIPファイル生成
         const zipBlob = await zip.generateAsync({ type: 'blob' });
@@ -1157,7 +1168,7 @@
         URL.revokeObjectURL(url);
 
         // 成功メッセージとガイド表示
-        alert(`✅ ${packId}-previews.zip をダウンロードしました！\n\n次の手順:\n1. ZIPファイルを解凍\n2. 解凍したフォルダ（${packId}）を以下の場所にコピー:\n   frontend/public/assets/template/\n3. サムネイル画像も同じフォルダにコピー\n4. JSONを生成して完了`);
+        alert(`✅ ${packId}-previews.zip をダウンロードしました！\n\n📦 含まれる画像: 10枚\n- プレビュー画像: 9枚\n- サムネイル画像: 1枚\n\n次の手順:\n1. ZIPファイルを解凍\n2. 解凍したフォルダ（${packId}）を以下の場所にコピー:\n   frontend/public/assets/template/\n3. JSONを生成して完了`);
 
         // ガイドを表示
         document.getElementById('zipGuide').style.display = 'block';
