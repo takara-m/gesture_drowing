@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gesdro! テンプレートパック管理ツール</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
     /* リセット＋基本スタイル */
     * {
@@ -257,6 +258,280 @@
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
+
+    /* プレビュー選択機能のスタイル */
+    .selection-counter {
+      text-align: center;
+      margin: 1rem 0;
+    }
+
+    .count-text {
+      display: inline-block;
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: #667eea;
+      padding: 0.5rem 1rem;
+      background: white;
+      border-radius: 8px;
+      border: 2px solid #667eea;
+    }
+
+    .count-text.complete {
+      color: #28a745;
+      border-color: #28a745;
+      background: #e8f5e9;
+    }
+
+    .preview-grid-selectable .preview-item {
+      position: relative;
+    }
+
+    .preview-checkbox {
+      position: absolute;
+      top: 0.5rem;
+      left: 0.5rem;
+      width: 24px;
+      height: 24px;
+      z-index: 2;
+      cursor: pointer;
+      accent-color: #667eea;
+    }
+
+    .preview-item.preview-selected {
+      border-color: #28a745;
+      box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.3);
+    }
+
+    .preview-badge {
+      position: absolute;
+      bottom: 0.5rem;
+      right: 0.5rem;
+      background: #28a745;
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      z-index: 1;
+    }
+
+    .photo-upload .preview-grid .preview-item {
+      cursor: pointer;
+    }
+
+    .preview-selection .preview-grid .preview-item {
+      cursor: default;
+    }
+
+    /* Section 2.6: プレビュー専用ドラッグ&ドロップ */
+    .preview-dropzone {
+      border: 3px dashed #667eea;
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      background: white;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin: 1rem 0;
+    }
+
+    .preview-dropzone:hover {
+      border-color: #5568d3;
+      border-style: solid;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      transform: scale(1.02);
+    }
+
+    .preview-dropzone.drag-over {
+      border-color: #28a745;
+      border-style: solid;
+      background: #e8f5e9;
+      box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4);
+      transform: scale(1.05);
+    }
+
+    .preview-dropzone-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .preview-dropzone-text {
+      font-size: 1.1rem;
+      color: #667eea;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    .preview-dropzone-hint {
+      font-size: 0.9rem;
+      color: #999;
+    }
+
+    .preview-only-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .preview-only-item {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 3px solid #28a745;
+      box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2);
+      transition: all 0.3s;
+    }
+
+    .preview-only-item:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 16px rgba(40, 167, 69, 0.4);
+    }
+
+    .preview-only-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .preview-only-badge {
+      position: absolute;
+      top: 0.5rem;
+      left: 0.5rem;
+      background: #28a745;
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.875rem;
+      font-weight: bold;
+      z-index: 1;
+    }
+
+    .remove-preview-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: #dc3545;
+      color: white;
+      border: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      transition: all 0.2s;
+      margin: 0;
+      padding: 0;
+    }
+
+    .remove-preview-btn:hover {
+      background: #c82333;
+      transform: scale(1.1);
+    }
+
+    .preview-only-count {
+      display: inline-block;
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: #667eea;
+      padding: 0.5rem 1rem;
+      background: white;
+      border-radius: 8px;
+      border: 2px solid #667eea;
+      margin: 1rem 0;
+    }
+
+    .preview-only-count.complete {
+      color: #28a745;
+      border-color: #28a745;
+      background: #e8f5e9;
+    }
+
+    .preview-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .clear-preview-btn {
+      flex: 1;
+      background: #dc3545;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .clear-preview-btn:hover {
+      background: #c82333;
+      transform: translateY(-2px);
+    }
+
+    .download-zip-btn {
+      flex: 1;
+      background: #667eea;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .download-zip-btn:hover:not(:disabled) {
+      background: #5568d3;
+      transform: translateY(-2px);
+    }
+
+    .download-zip-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .zip-guide {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 1rem;
+      margin-top: 1rem;
+      border-radius: 4px;
+    }
+
+    .zip-guide h4 {
+      color: #856404;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .zip-guide ol {
+      margin-left: 1.5rem;
+      color: #856404;
+    }
+
+    .zip-guide li {
+      margin-bottom: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    .zip-guide code {
+      background: #fff;
+      padding: 0.2rem 0.4rem;
+      border-radius: 3px;
+      font-family: monospace;
+      font-size: 0.875rem;
+    }
   </style>
 </head>
 <body>
@@ -302,6 +577,72 @@
       <input type="file" id="photoInput" accept="image/*" multiple>
       <div id="photoPreview" class="preview-grid"></div>
       <p class="info">※ サムネイルにしたい写真を1枚クリックして選択してください（青枠で表示されます）</p>
+      <p class="info" style="margin-top: 0.5rem; color: #667eea;">
+        💡 プレビュー画像は、<strong>セクション2.6で専用アップロード（推奨）</strong>または<strong>セクション2.5でチェックボックス選択</strong>できます
+      </p>
+    </section>
+
+    <!-- セクション2.5: プレビュー画像選択 -->
+    <section class="preview-selection">
+      <h2>2.5 プレビュー画像選択</h2>
+      <p class="info">
+        パック購入画面に表示されるプレビュー画像を<strong>正確に9枚</strong>選択してください。
+        <br>※ サムネイル画像と重複しても構いません。最低9枚の写真をアップロードしてください。
+      </p>
+
+      <div class="selection-counter">
+        <span id="previewCount" class="count-text">0/9 選択済み</span>
+      </div>
+
+      <div id="previewSelectionGrid" class="preview-grid preview-grid-selectable"></div>
+
+      <p class="info" style="margin-top: 1rem; color: #d32f2f;" id="previewError" hidden>
+        ⚠️ プレビュー画像を正確に9枚選択してください（現在: <span id="errorCount">0</span>枚）
+      </p>
+    </section>
+
+    <!-- セクション2.6: プレビュー画像専用アップロード -->
+    <section class="preview-only-section">
+      <h2>2.6 プレビュー画像専用アップロード（推奨）</h2>
+      <p class="info">
+        <strong>💡 新機能:</strong> プレビュー画像9枚を直接ドラッグ&ドロップできます。<br>
+        ZIPファイルでダウンロードし、指定フォルダに配置するだけで完了します。<br>
+        ※ セクション2.5（チェックボックス選択）よりもこちらの方法を推奨します。
+      </p>
+
+      <!-- ドロップゾーン -->
+      <div id="previewDropzone" class="preview-dropzone">
+        <div class="preview-dropzone-icon">📸</div>
+        <div class="preview-dropzone-text">プレビュー画像9枚をドラッグ&ドロップ</div>
+        <div class="preview-dropzone-hint">またはクリックしてファイルを選択</div>
+      </div>
+
+      <input type="file" id="previewOnlyInput" accept="image/*" multiple style="display: none;">
+
+      <!-- カウンター -->
+      <div class="selection-counter">
+        <span id="previewOnlyCount" class="preview-only-count">0/9 枚</span>
+      </div>
+
+      <!-- プレビューグリッド -->
+      <div id="previewOnlyGrid" class="preview-only-grid"></div>
+
+      <!-- アクションボタン -->
+      <div class="preview-actions" id="previewActions" style="display: none;">
+        <button id="clearPreviewBtn" class="clear-preview-btn">🗑️ すべてクリア</button>
+        <button id="downloadZipBtn" class="download-zip-btn" disabled>📦 ZIPダウンロード</button>
+      </div>
+
+      <!-- 配置ガイド -->
+      <div class="zip-guide" id="zipGuide" style="display: none;">
+        <h4>📁 ZIPダウンロード後の配置手順</h4>
+        <ol>
+          <li>ダウンロードした <code>{pack-id}-previews.zip</code> を解凍</li>
+          <li>解凍したフォルダ（<code>{pack-id}</code>）を <code>frontend/public/assets/template/</code> にコピー</li>
+          <li>サムネイル画像も同じフォルダにコピー</li>
+          <li>JSONを生成して完了</li>
+        </ol>
+      </div>
     </section>
 
     <!-- セクション3: JSON生成 -->
@@ -322,16 +663,40 @@
 
     <!-- セクション4: 使い方ガイド -->
     <section class="guide">
-      <h2>📖 使い方</h2>
+      <h2>📖 使い方（推奨フロー）</h2>
       <ol>
         <li>パック情報を入力（パックID、名前、説明、カテゴリー、価格など）</li>
-        <li>写真を複数選択してアップロード</li>
+        <li>写真を複数選択してアップロード（セクション2）</li>
         <li>サムネイルにしたい写真を1枚クリック（青枠で表示）</li>
+        <li><strong>【推奨】</strong> プレビュー画像9枚をドラッグ&ドロップ（セクション2.6）<br>
+            または、チェックボックスで9枚選択（セクション2.5）</li>
         <li>「JSONを生成」ボタンをクリック</li>
         <li>生成されたメタデータをコピーして <code>frontend/public/data/templatePacks.json</code> の <code>packs</code> 配列に追加</li>
         <li>パック用JSONをダウンロードして <code>frontend/public/data/packs/</code> フォルダに配置</li>
-        <li><strong>重要:</strong> サムネイル用に選択した写真を <code>frontend/public/assets/template/</code> に手動でコピー</li>
+        <li><strong>【重要】</strong> 画像ファイルの配置:
+          <ul>
+            <li>セクション2.6使用時: 「ZIPダウンロード」をクリック → 解凍 → フォルダごと <code>frontend/public/assets/template/</code> にコピー</li>
+            <li>セクション2.5使用時: 選択した9枚の画像を手動で <code>frontend/public/assets/template/{pack-id}/</code> にコピー</li>
+          </ul>
+        </li>
+        <li>サムネイル画像も <code>frontend/public/assets/template/{pack-id}/</code> にコピー</li>
       </ol>
+
+      <h3 style="margin-top: 1.5rem; color: #667eea;">📁 最終的なフォルダ構造</h3>
+      <pre style="background: #2d2d2d; color: #f8f8f2; padding: 1rem; border-radius: 8px; overflow-x: auto; font-size: 0.875rem; line-height: 1.6;">frontend/
+└── public/
+    ├── data/
+    │   ├── templatePacks.json
+    │   └── packs/
+    │       └── {pack-id}.json
+    └── assets/
+        └── template/
+            └── {pack-id}/              ← パックIDごとのフォルダ
+                ├── preview1.jpg        ← プレビュー画像9枚
+                ├── preview2.jpg
+                ├── ...
+                ├── preview9.jpg
+                └── thumbnail.jpg       ← サムネイル画像</pre>
     </section>
   </div>
 
@@ -339,6 +704,8 @@
     // グローバル変数
     let uploadedPhotos = [];
     let selectedThumbnailIndex = 0;
+    let selectedPreviewIndices = []; // プレビュー画像選択用（9枚必須）
+    let previewOnlyPhotos = []; // Section 2.6専用の9枚（ドラッグ&ドロップ）
 
     // ファイル選択時の処理
     document.getElementById('photoInput').addEventListener('change', async (e) => {
@@ -348,6 +715,7 @@
       const previewContainer = document.getElementById('photoPreview');
       previewContainer.innerHTML = '<p>処理中...</p>';
       uploadedPhotos = [];
+      selectedPreviewIndices = [];
 
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
@@ -379,11 +747,12 @@
       await Promise.all(uploadedPhotos.map(photo => getImageDimensions(photo)));
 
       // プレビュー表示
-      renderPhotoPreview();
+      renderThumbnailPreview();
+      renderPreviewSelectionGrid();
     });
 
-    // プレビューレンダリング
-    function renderPhotoPreview() {
+    // サムネイルプレビューレンダリング
+    function renderThumbnailPreview() {
       const previewContainer = document.getElementById('photoPreview');
       previewContainer.innerHTML = '';
 
@@ -409,10 +778,107 @@
       });
     }
 
+    // プレビュー画像選択グリッドのレンダリング
+    function renderPreviewSelectionGrid() {
+      const gridContainer = document.getElementById('previewSelectionGrid');
+
+      if (uploadedPhotos.length === 0) {
+        gridContainer.innerHTML = '<p style="text-align: center; color: #999;">まず写真をアップロードしてください</p>';
+        return;
+      }
+
+      gridContainer.innerHTML = '';
+
+      uploadedPhotos.forEach((photo, index) => {
+        const item = document.createElement('div');
+        item.className = 'preview-item';
+
+        const isSelected = selectedPreviewIndices.includes(index);
+        if (isSelected) {
+          item.classList.add('preview-selected');
+        }
+
+        // チェックボックス
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.className = 'preview-checkbox';
+        checkbox.checked = isSelected;
+        checkbox.addEventListener('change', (e) => togglePreviewSelection(index, e.target.checked));
+        item.appendChild(checkbox);
+
+        // 画像
+        const img = document.createElement('img');
+        img.src = photo.dataUrl;
+        img.alt = photo.filename;
+        item.appendChild(img);
+
+        // 番号バッジ
+        if (isSelected) {
+          const badge = document.createElement('div');
+          badge.className = 'preview-badge';
+          const position = selectedPreviewIndices.indexOf(index) + 1;
+          badge.textContent = `#${position}`;
+          item.appendChild(badge);
+        }
+
+        gridContainer.appendChild(item);
+      });
+
+      updatePreviewCounter();
+    }
+
     // サムネイル選択
     function selectThumbnail(index) {
       selectedThumbnailIndex = index;
-      renderPhotoPreview();
+      renderThumbnailPreview();
+    }
+
+    // プレビュー画像選択のトグル
+    function togglePreviewSelection(index, isChecked) {
+      if (isChecked) {
+        if (selectedPreviewIndices.length >= 9) {
+          alert('⚠️ プレビュー画像は最大9枚まで選択できます。\n他の画像を選択するには、既存の選択を解除してください。');
+          renderPreviewSelectionGrid();
+          return;
+        }
+        selectedPreviewIndices.push(index);
+      } else {
+        const position = selectedPreviewIndices.indexOf(index);
+        if (position > -1) {
+          selectedPreviewIndices.splice(position, 1);
+        }
+      }
+      renderPreviewSelectionGrid();
+    }
+
+    // プレビュー選択カウンターの更新
+    function updatePreviewCounter() {
+      const countElement = document.getElementById('previewCount');
+      const count = selectedPreviewIndices.length;
+
+      countElement.textContent = `${count}/9 選択済み`;
+
+      if (count === 9) {
+        countElement.classList.add('complete');
+      } else {
+        countElement.classList.remove('complete');
+      }
+    }
+
+    // プレビュー選択のバリデーション
+    function validatePreviewSelection() {
+      const count = selectedPreviewIndices.length;
+      const errorElement = document.getElementById('previewError');
+      const errorCountElement = document.getElementById('errorCount');
+
+      if (count !== 9) {
+        errorElement.hidden = false;
+        errorCountElement.textContent = count;
+        return false;
+      }
+
+      errorElement.hidden = true;
+      return true;
     }
 
     // ファイルをData URLに変換
@@ -469,6 +935,238 @@
       });
     }
 
+    // ========================================
+    // Section 2.6: プレビュー専用ドラッグ&ドロップ
+    // ========================================
+
+    const previewDropzone = document.getElementById('previewDropzone');
+    const previewOnlyInput = document.getElementById('previewOnlyInput');
+
+    // ドロップゾーンのイベントハンドラー
+    previewDropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      previewDropzone.classList.add('drag-over');
+    });
+
+    previewDropzone.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      previewDropzone.classList.remove('drag-over');
+    });
+
+    previewDropzone.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      previewDropzone.classList.remove('drag-over');
+
+      const files = Array.from(e.dataTransfer.files);
+      await handlePreviewOnlyFiles(files);
+    });
+
+    // クリックでファイル選択
+    previewDropzone.addEventListener('click', () => {
+      previewOnlyInput.click();
+    });
+
+    // ファイル入力の変更イベント
+    previewOnlyInput.addEventListener('change', async (e) => {
+      const files = Array.from(e.target.files);
+      await handlePreviewOnlyFiles(files);
+      e.target.value = ''; // リセット
+    });
+
+    // プレビュー専用ファイル処理
+    async function handlePreviewOnlyFiles(files) {
+      if (files.length === 0) return;
+
+      // 画像ファイルのみフィルタリング
+      const imageFiles = files.filter(file => file.type.startsWith('image/'));
+
+      if (imageFiles.length !== files.length) {
+        alert('⚠️ 画像ファイル以外はアップロードできません。\n\n画像ファイルのみ選択してください。');
+      }
+
+      if (imageFiles.length === 0) return;
+
+      // 9枚制限チェック
+      const currentCount = previewOnlyPhotos.length;
+      const totalCount = currentCount + imageFiles.length;
+
+      if (totalCount > 9) {
+        alert(`⚠️ プレビュー画像は最大9枚までです。\n\n現在: ${currentCount}枚\n追加しようとした: ${imageFiles.length}枚\n合計: ${totalCount}枚\n\n${9 - currentCount}枚まで追加できます。\n\n対処法:\n- 「すべてクリア」ボタンで既存の画像を削除してから再度アップロード\n- または、×ボタンで不要な画像を個別に削除`);
+        return;
+      }
+
+      // ファイル処理
+      for (const file of imageFiles) {
+        try {
+          const dataUrl = await fileToDataUrl(file);
+
+          const photoData = {
+            filename: file.name,
+            dataUrl: dataUrl,
+            fileSize: file.size
+          };
+
+          previewOnlyPhotos.push(photoData);
+        } catch (error) {
+          console.error(`Failed to process ${file.name}:`, error);
+          alert(`❌ ${file.name} の処理に失敗しました。`);
+        }
+      }
+
+      renderPreviewOnlyGrid();
+      updatePreviewOnlyCounter();
+      updateDownloadZipButton();
+    }
+
+    // プレビュー専用グリッドのレンダリング
+    function renderPreviewOnlyGrid() {
+      const gridContainer = document.getElementById('previewOnlyGrid');
+      const actionsContainer = document.getElementById('previewActions');
+
+      if (previewOnlyPhotos.length === 0) {
+        gridContainer.innerHTML = '';
+        actionsContainer.style.display = 'none';
+        return;
+      }
+
+      actionsContainer.style.display = 'flex';
+      gridContainer.innerHTML = '';
+
+      previewOnlyPhotos.forEach((photo, index) => {
+        const item = document.createElement('div');
+        item.className = 'preview-only-item';
+
+        // 番号バッジ
+        const badge = document.createElement('div');
+        badge.className = 'preview-only-badge';
+        badge.textContent = `#${index + 1}`;
+        item.appendChild(badge);
+
+        // 削除ボタン
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'remove-preview-btn';
+        removeBtn.textContent = '×';
+        removeBtn.title = '削除';
+        removeBtn.onclick = (e) => {
+          e.stopPropagation();
+          removePreviewOnly(index);
+        };
+        item.appendChild(removeBtn);
+
+        // 画像
+        const img = document.createElement('img');
+        img.src = photo.dataUrl;
+        img.alt = photo.filename;
+        item.appendChild(img);
+
+        gridContainer.appendChild(item);
+      });
+    }
+
+    // プレビュー専用画像の削除
+    function removePreviewOnly(index) {
+      previewOnlyPhotos.splice(index, 1);
+      renderPreviewOnlyGrid();
+      updatePreviewOnlyCounter();
+      updateDownloadZipButton();
+    }
+
+    // プレビュー専用カウンターの更新
+    function updatePreviewOnlyCounter() {
+      const countElement = document.getElementById('previewOnlyCount');
+      const count = previewOnlyPhotos.length;
+
+      countElement.textContent = `${count}/9 枚`;
+
+      if (count === 9) {
+        countElement.classList.add('complete');
+      } else {
+        countElement.classList.remove('complete');
+      }
+    }
+
+    // ZIPダウンロードボタンの有効/無効切り替え
+    function updateDownloadZipButton() {
+      const downloadBtn = document.getElementById('downloadZipBtn');
+      const count = previewOnlyPhotos.length;
+
+      if (count === 9) {
+        downloadBtn.disabled = false;
+      } else {
+        downloadBtn.disabled = true;
+      }
+    }
+
+    // すべてクリアボタン
+    document.getElementById('clearPreviewBtn').addEventListener('click', () => {
+      if (previewOnlyPhotos.length === 0) return;
+
+      if (confirm(`本当にすべての画像（${previewOnlyPhotos.length}枚）を削除しますか？`)) {
+        previewOnlyPhotos = [];
+        renderPreviewOnlyGrid();
+        updatePreviewOnlyCounter();
+        updateDownloadZipButton();
+      }
+    });
+
+    // ZIPダウンロードボタン
+    document.getElementById('downloadZipBtn').addEventListener('click', async () => {
+      const packId = document.getElementById('packId').value.trim();
+
+      // Pack ID必須チェック
+      if (!packId) {
+        alert('❌ パックIDを入力してください。\n\nセクション1でパックIDを入力してから、ZIPをダウンロードしてください。');
+        document.getElementById('packId').focus();
+        return;
+      }
+
+      if (previewOnlyPhotos.length !== 9) {
+        alert('❌ プレビュー画像が9枚ありません。\n\n現在: ' + previewOnlyPhotos.length + '枚');
+        return;
+      }
+
+      try {
+        // JSZipインスタンス作成
+        const zip = new JSZip();
+        const folder = zip.folder(packId);
+
+        // 9枚の画像をZIPに追加
+        for (let i = 0; i < previewOnlyPhotos.length; i++) {
+          const photo = previewOnlyPhotos[i];
+
+          // Data URLをBlobに変換
+          const response = await fetch(photo.dataUrl);
+          const blob = await response.blob();
+
+          // ファイルをフォルダに追加
+          folder.file(photo.filename, blob);
+        }
+
+        // ZIPファイル生成
+        const zipBlob = await zip.generateAsync({ type: 'blob' });
+
+        // ダウンロード
+        const url = URL.createObjectURL(zipBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${packId}-previews.zip`;
+        link.click();
+        URL.revokeObjectURL(url);
+
+        // 成功メッセージとガイド表示
+        alert(`✅ ${packId}-previews.zip をダウンロードしました！\n\n次の手順:\n1. ZIPファイルを解凍\n2. 解凍したフォルダ（${packId}）を以下の場所にコピー:\n   frontend/public/assets/template/\n3. サムネイル画像も同じフォルダにコピー\n4. JSONを生成して完了`);
+
+        // ガイドを表示
+        document.getElementById('zipGuide').style.display = 'block';
+      } catch (error) {
+        console.error('ZIP creation failed:', error);
+        alert('❌ ZIPファイルの作成に失敗しました。\n\nエラー: ' + error.message);
+      }
+    });
+
     // JSON生成
     document.getElementById('generateBtn').addEventListener('click', () => {
       // フォームデータ取得
@@ -489,6 +1187,42 @@
         return;
       }
 
+      // プレビュー画像バリデーション（優先順位: Section 2.6 → Section 2.5）
+      const previewOnlyCount = previewOnlyPhotos.length;
+      const previewSelectionCount = selectedPreviewIndices.length;
+      let usingPreviewOnly = false;
+      let previewImagePaths = [];
+
+      // Section 2.6: プレビュー専用ドラッグ&ドロップ
+      if (previewOnlyCount === 9) {
+        // Section 2.6が完了している場合はそちらを優先
+        usingPreviewOnly = true;
+        previewImagePaths = previewOnlyPhotos.map(photo =>
+          `/assets/template/${packId}/${photo.filename}`
+        );
+      } else if (previewOnlyCount > 0 && previewOnlyCount < 9) {
+        // Section 2.6が部分的にある場合はエラー
+        alert(`❌ セクション2.6のプレビュー画像が不完全です。\n\n現在: ${previewOnlyCount}/9 枚\n\n対処法:\n- すべてクリアして、セクション2.5のチェックボックスで9枚選択\n- または、残り${9 - previewOnlyCount}枚を追加してZIPダウンロード`);
+        document.getElementById('previewOnlyGrid').scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        });
+        return;
+      } else if (previewSelectionCount === 9) {
+        // Section 2.6が空で、Section 2.5が完了している場合
+        usingPreviewOnly = false;
+        previewImagePaths = selectedPreviewIndices.map(index =>
+          `/assets/template/${packId}/${uploadedPhotos[index].filename}`
+        );
+      } else {
+        // どちらも不完全
+        alert(`❌ プレビュー画像が設定されていません。\n\n【推奨】セクション2.6でドラッグ&ドロップ:\n- 現在: ${previewOnlyCount}/9 枚\n\nまたは\n\n【従来】セクション2.5でチェックボックス選択:\n- 現在: ${previewSelectionCount}/9 枚選択済み\n\nどちらかの方法で正確に9枚選択してください。`);
+        return;
+      }
+
+      // サムネイルURLもpack-id/filename形式に
+      const thumbnailPath = `/assets/template/${packId}/${uploadedPhotos[selectedThumbnailIndex].filename}`;
+
       // メタデータJSON生成
       const metadata = {
         id: packId,
@@ -503,8 +1237,8 @@
         category: category,
         price: price,
         photoCount: uploadedPhotos.length,
-        thumbnailUrl: `/assets/template/${uploadedPhotos[selectedThumbnailIndex].filename}`,
-        previewImages: [],
+        thumbnailUrl: thumbnailPath,
+        previewImages: previewImagePaths,
         isFree: isFree,
         stripeProductId: stripeProductId,
         stripePriceId: stripePriceId
@@ -533,6 +1267,11 @@
       document.getElementById('metadataOutput').value = JSON.stringify(metadata, null, 2);
       document.getElementById('packDataOutput').value = JSON.stringify(packData, null, 2);
       document.getElementById('outputArea').style.display = 'block';
+
+      // Section 2.6使用時のリマインダー
+      if (usingPreviewOnly) {
+        alert(`✅ JSON生成完了！\n\n【重要】セクション2.6を使用しているため、以下の手順を忘れずに:\n\n1. セクション2.6の「ZIPダウンロード」ボタンをクリック\n2. ダウンロードしたZIPファイルを解凍\n3. 解凍したフォルダ（${packId}）を以下にコピー:\n   frontend/public/assets/template/\n4. サムネイル画像も同じフォルダにコピー\n\nパスの例:\nfrontend/public/assets/template/${packId}/preview1.jpg`);
+      }
 
       // スクロール
       document.getElementById('outputArea').scrollIntoView({ behavior: 'smooth', block: 'start' });
