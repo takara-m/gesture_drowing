@@ -6,6 +6,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Gesdro!** is a progressive face gesture drawing learning tool with 2 learning steps. Users trace and draw faces with increasing difficulty, from tracing over photos to independent drawing.
 
+### Architecture
+
+This is a **standalone React + Vite SPA** serving only the Gesdro application. The main ennui-lab site (blog, about, contact pages) is maintained in a separate repository.
+
+**Deployment Structure**:
+- **Gesdro App** (this repository): https://gesdro.ennui-lab.com
+- **Main Site** (separate repository): https://www.ennui-lab.com - [ennui-lab-main](https://github.com/takara-m/ennui-lab-main)
+
+**Integration**: The Gesdro app can link to the main site using the `VITE_MAIN_SITE_URL` environment variable for footer links and external navigation.
+
 ## Development Commands
 
 **IMPORTANT**: This is a frontend-only application located in the `frontend/` directory. You must navigate there first.
@@ -337,7 +347,10 @@ frontend/src/
 │   ├── PhotoUploader.tsx             # Multi-file upload with folder selection
 │   └── PhotoGrid.tsx                 # Gallery with folder filtering
 ├── pages/
-│   └── PhotoManager.tsx              # Photo library + folder management
+│   ├── GesdroApp.tsx                 # Main Gesdro application page
+│   ├── PhotoManager.tsx              # Photo library + folder management
+│   ├── TemplateStore.tsx             # Template pack store (Stripe integration)
+│   └── TemplateStoreSuccess.tsx      # Purchase success page
 ├── services/
 │   ├── db.ts                         # Dexie database schema (v3 with folders)
 │   ├── photoService.ts               # Photo CRUD + image processing
@@ -349,7 +362,7 @@ frontend/src/
 │   │   └── en.json                   # English translations
 │   └── contexts/
 │       └── LanguageContext.tsx       # Language state management
-├── App.tsx                           # Router + language provider
+├── App.tsx                           # Router (root "/" → GesdroApp)
 └── main.tsx                          # Entry point
 ```
 
