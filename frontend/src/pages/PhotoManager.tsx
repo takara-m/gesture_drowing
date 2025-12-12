@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Plus, Download, Upload as UploadIcon, Play, Folder as FolderIcon, Trash2, ExternalLink, X, ShoppingBag } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { PhotoUploader } from '../components/PhotoUploader';
 import { PhotoGrid } from '../components/PhotoGrid';
 import { useLanguage } from '../contexts/LanguageContext';
