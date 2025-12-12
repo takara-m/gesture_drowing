@@ -51,6 +51,10 @@
       "restore": "Restore",
       "hint": "Click on a photo to use it in the drawing tool. You can upload multiple photos at once."
     },
+    "templateStore": {
+      "callToAction": "If you find uploading photos tedious",
+      "browseButton": "Browse Photo Packs"
+    },
     "savedPhotos": "Saved Photos",
     "backupStatus": {
       "exporting": "Exporting...",

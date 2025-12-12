@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import type { TemplatePackMetadata, TemplateCategory, TemplatePacksData } from '../types/templatePack';
 import { redirectToCheckout } from '../services/stripeService';
+import { TemplatePreviewModal } from '../components/TemplatePreviewModal';
 
 export const TemplateStore: React.FC = () => {
   const { t, language } = useLanguage();
@@ -13,6 +14,7 @@ export const TemplateStore: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<TemplateCategory | 'all'>('all');
   const [purchasing, setPurchasing] = useState<string | null>(null);
+  const [selectedPreviewPack, setSelectedPreviewPack] = useState<TemplatePackMetadata | null>(null);
 
   // Load template packs from JSON
   useEffect(() => {
@@ -76,7 +78,7 @@ export const TemplateStore: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center gap-4 mb-4">
             <button
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/gesdro')}
               className="p-2 hover:bg-procreate-hover rounded-lg transition-colors text-white"
               aria-label={t('templateStore.backToApp')}
             >
@@ -193,12 +195,30 @@ export const TemplateStore: React.FC = () => {
                       pack.isFree ? t('templateStore.packCard.download') : t('templateStore.packCard.purchase')
                     )}
                   </button>
+
+                  {/* View Samples Button */}
+                  {pack.previewImages && pack.previewImages.length > 0 && (
+                    <button
+                      className="w-full mt-2 bg-gray-700 text-white font-medium py-2 rounded-lg hover:bg-gray-600 transition-all hover:scale-[0.98] active:scale-[0.98]"
+                      onClick={() => setSelectedPreviewPack(pack)}
+                    >
+                      サンプルを見る
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* Preview Modal */}
+      <TemplatePreviewModal
+        isOpen={selectedPreviewPack !== null}
+        onClose={() => setSelectedPreviewPack(null)}
+        previewImages={selectedPreviewPack?.previewImages || []}
+        packName={selectedPreviewPack?.name[language] || ''}
+      />
     </div>
   );
 };

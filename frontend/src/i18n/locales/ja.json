@@ -51,6 +51,10 @@
       "restore": "復元",
       "hint": "写真をクリックして描画ツールで使用できます。複数の写真をまとめてアップロード可能です。"
     },
+    "templateStore": {
+      "callToAction": "写真のアップロードが面倒な人は",
+      "browseButton": "写真パックを見る"
+    },
     "savedPhotos": "保存された写真",
     "backupStatus": {
       "exporting": "エクスポート中...",

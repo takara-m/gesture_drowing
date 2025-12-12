@@ -16,7 +16,17 @@
       "Bash(cd:*)",
       "Bash(npm install:*)",
       "Bash(/tmp/layout-changes.patch)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(git remote:*)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --app --no-src-dir --eslint --import-alias \"@/*\")",
+      "Bash(ls:*)",
+      "Bash(git pull:*)",
+      "Bash(git rebase:*)",
+      "Bash(git rm:*)",
+      "Bash(npm run lint)",
+      "Bash(npx tsc:*)",
+      "Bash(cat:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

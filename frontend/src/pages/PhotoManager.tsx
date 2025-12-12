@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Plus, Download, Upload as UploadIcon, Play, Folder as FolderIcon, Trash2, ExternalLink, X } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Plus, Download, Upload as UploadIcon, Play, Folder as FolderIcon, Trash2, ExternalLink, X, ShoppingBag } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { PhotoUploader } from '../components/PhotoUploader';
 import { PhotoGrid } from '../components/PhotoGrid';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -15,6 +15,7 @@ interface PhotoManagerProps {
 
 export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [showUploader, setShowUploader] = useState(false);
   const [gridKey, setGridKey] = useState(0); // グリッドの再レンダリング用
   const [selectedOrder, setSelectedOrder] = useState<'oldest' | 'newest' | 'random'>('random');
@@ -62,6 +63,11 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
     if (photo && onPhotoSelect) {
       onPhotoSelect(photo, practiceFolderId);
     }
+  };
+
+  // Navigate to Template Store
+  const handleBrowseTemplates = () => {
+    navigate('/templates');
   };
 
   // フォルダ作成（セキュリティ強化: バリデーション追加）
@@ -429,11 +435,25 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
               </div>
             </div>
 
-            {/* 説明 */}
+            {/* 説明 + Template Store CTA */}
             <div className="bg-procreate-tag rounded-lg p-4">
-              <p className="text-sm text-gray-300">
+              <p className="text-sm text-gray-300 mb-4">
                 💡 {t('photoManager.management.hint')}
               </p>
+
+              {/* Template Store Call-to-Action */}
+              <div className="mt-3 pt-3 border-t border-gray-600 flex flex-col items-center">
+                <p className="text-sm text-gray-400 mb-3 text-center">
+                  {t('photoManager.templateStore.callToAction')}
+                </p>
+                <button
+                  onClick={handleBrowseTemplates}
+                  className="template-store-button w-full max-w-xs inline-flex items-center justify-center gap-3 px-5 py-3 bg-procreate-accent text-white rounded-lg hover:bg-blue-600 transition-colors font-semibold text-base"
+                >
+                  <ShoppingBag size={20} />
+                  {t('photoManager.templateStore.browseButton')}
+                </button>
+              </div>
             </div>
 
             {/* バックアップ・復元のステータスメッセージ */}
