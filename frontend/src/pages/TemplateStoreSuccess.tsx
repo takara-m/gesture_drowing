@@ -103,7 +103,7 @@ export const TemplateStoreSuccess: React.FC = () => {
           </button>
 
           <button
-            onClick={() => navigate('/gesdro/photos')}
+            onClick={() => navigate('/')}
             className="w-full bg-gray-600 text-white font-semibold py-3 rounded-lg hover:bg-gray-500 transition-all"
           >
             {t('templateStore.purchaseSuccess.importButton')}
