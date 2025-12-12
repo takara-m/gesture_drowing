@@ -78,7 +78,7 @@ export const TemplateStore: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center gap-4 mb-4">
             <button
-              onClick={() => navigate('/gesdro')}
+              onClick={() => navigate('/')}
               className="p-2 hover:bg-procreate-hover rounded-lg transition-colors text-white"
               aria-label={t('templateStore.backToApp')}
             >

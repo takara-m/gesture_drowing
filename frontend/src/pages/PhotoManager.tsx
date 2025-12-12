@@ -598,13 +598,15 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
         {/* フッター */}
         <footer className="mt-12 pb-6 text-center space-y-4">
           {/* 開発者サイトへのリンク */}
-          <Link
-            to="/"
+          <a
+            href={import.meta.env.VITE_MAIN_SITE_URL || 'https://www.ennui-lab.com'}
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-4 py-2 bg-procreate-card text-white rounded-xl hover:bg-procreate-hover transition-all border border-gray-600"
           >
             <ExternalLink size={18} />
             <span>開発者のWEBサイトはこちら</span>
-          </Link>
+          </a>
           <p className="text-sm text-gray-400">
             © 2025 あんにゅい. All rights reserved.
           </p>
