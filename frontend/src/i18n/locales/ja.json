@@ -266,6 +266,8 @@
     },
     "loading": "パックを読み込み中...",
     "loadError": "読み込みエラー",
-    "loadErrorDescription": "パック情報の読み込みに失敗しました"
+    "loadErrorDescription": "パック情報の読み込みに失敗しました",
+    "freePackDownloaded": "{{packName}} をダウンロードして写真管理画面に追加しました！",
+    "downloadError": "ダウンロードに失敗しました。もう一度お試しください。"
   }
 }

@@ -266,6 +266,8 @@
     },
     "loading": "Loading packs...",
     "loadError": "Load Error",
-    "loadErrorDescription": "Failed to load pack information"
+    "loadErrorDescription": "Failed to load pack information",
+    "freePackDownloaded": "{{packName}} has been downloaded and added to your photo library!",
+    "downloadError": "Download failed. Please try again."
   }
 }

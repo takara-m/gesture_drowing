@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import type { TemplatePackMetadata, TemplateCategory, TemplatePacksData } from '../types/templatePack';
 import { redirectToCheckout } from '../services/stripeService';
+import { downloadFreePack } from '../services/templatePackService';
 import { TemplatePreviewModal } from '../components/TemplatePreviewModal';
 
 export const TemplateStore: React.FC = () => {
@@ -49,9 +50,25 @@ export const TemplateStore: React.FC = () => {
   // Purchase handler
   const handlePurchase = async (pack: TemplatePackMetadata) => {
     if (pack.isFree) {
-      // 無料パックの場合はダウンロード（Phase 3で実装）
-      console.log('[TemplateStore] Free pack download:', pack.id);
-      alert('無料パックのダウンロード機能はPhase 3で実装予定です');
+      // 無料パックのダウンロード＆インポート
+      try {
+        setPurchasing(pack.id);
+
+        await downloadFreePack(pack.id);
+
+        alert(t('templateStore.freePackDownloaded', {
+          packName: pack.name[language]
+        }));
+
+        // PhotoManager画面へ遷移
+        navigate('/');
+
+      } catch (error) {
+        console.error('[TemplateStore] Free pack download failed:', error);
+        alert(t('templateStore.downloadError'));
+      } finally {
+        setPurchasing(null);
+      }
       return;
     }
 

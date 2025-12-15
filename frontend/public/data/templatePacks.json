@@ -24,104 +24,218 @@
       "stripeProductId": "",
       "stripePriceId": ""
     },
+
     {
-      "id": "pack-portrait-pro",
+      "id": "free-pack-1",
       "name": {
-        "ja": "プロポートレートパック",
-        "en": "Pro Portrait Pack"
+        "ja": "無料テンプレートパック",
+        "en": "Free Template Pack"
       },
       "description": {
-        "ja": "プロ撮影の高品質ポートレート15枚",
-        "en": "15 professional portrait photos"
+        "ja": "15枚のさまざまな顔。とりあえずお試しで使いたい方に最適です",
+        "en": "15 different faces. Perfect for those who want to try it out first."
       },
       "category": "portrait",
-      "price": 300,
+      "price": 0,
       "photoCount": 15,
-      "thumbnailUrl": "/assets/template/Close-Up Portrait.png",
-      "previewImages": [],
-      "isFree": false,
-      "stripeProductId": "prod_TXAz9yWN23dw4G",
-      "stripePriceId": "price_1Sa6dTECl1bhpZb4TkugjCyL"
-    },
-    {
-      "id": "pack-pose-dynamic",
-      "name": {
-        "ja": "ダイナミックポーズパック",
-        "en": "Dynamic Pose Pack"
-      },
-      "description": {
-        "ja": "躍動感あふれるポーズ写真20枚",
-        "en": "20 dynamic pose reference photos"
-      },
-      "category": "pose",
-      "price": 500,
-      "photoCount": 20,
-      "thumbnailUrl": "/assets/template/Portrait Profile View.png",
-      "previewImages": [],
-      "isFree": false,
-      "stripeProductId": "prod_TXB06zLPXV6jl9",
-      "stripePriceId": "price_1Sa6e7ECl1bhpZb4Ia0Y8tLK"
+      "thumbnailUrl": "/assets/template/free-pack-1/free_face_001.jpg",
+      "previewImages": [
+        "/assets/template/free-pack-1/free_face_003.jpg",
+        "/assets/template/free-pack-1/free_face_004.jpg",
+        "/assets/template/free-pack-1/free_face_006.jpg",
+        "/assets/template/free-pack-1/free_face_007.jpg",
+        "/assets/template/free-pack-1/free_face_010.jpg",
+        "/assets/template/free-pack-1/free_face_014.jpg",
+        "/assets/template/free-pack-1/free_face_013.jpg",
+        "/assets/template/free-pack-1/free_face_009.jpg",
+        "/assets/template/free-pack-1/free_face_001.jpg"
+      ],
+      "isFree": true,
+      "stripeProductId": "",
+      "stripePriceId": ""
     },
 
     {
-      "id": "pack-face-Woman-vol1",
+      "id": "Man_vol1",
       "name": {
-        "ja": "女性の顔 ボリューム1",
-        "en": "Women's faces vol.1"
+        "ja": "男性　ボリューム１",
+        "en": "Man vol.1"
       },
       "description": {
-        "ja": "女性の顔 幅広い年齢層 様々な角度",
-        "en": "Women's faces Wide range of ages Various angles"
+        "ja": "100枚の男性の顔。様々な顔の向き・表情・年齢層",
+        "en": "100 male faces. Various orientations, expressions, and age groups."
       },
       "category": "portrait",
       "price": 300,
       "photoCount": 100,
-      "thumbnailUrl": "/assets/template/pose_6_An_ethereal_close_up_of_a_Japa.jpg",
+      "thumbnailUrl": "/assets/template/Man_vol1/Man_vol_1_076.jpg",
       "previewImages": [
-        "/assets/template/gesture-genius-1764742687425.jpg",
-        "/assets/template/gesture-genius-1764775876993.jpg",
-        "/assets/template/pose_2_A_medium_close_up_of_a_Japanes.jpg",
-        "/assets/template/pose_2_Japanese_woman__20s_30s__Mediu.jpg",
-        "/assets/template/pose_8_A_Japanese_woman__20_40s__in_a.jpg",
-        "/assets/template/gesture-genius-1764740669653.jpg",
-        "/assets/template/pose_1_Japanese_woman__20s_30s__Extre.jpg",
-        "/assets/template/pose_6_Japanese_woman__20_30s__Medium.jpg",
-        "/assets/template/pose_2_Close_up_of_a_Japanese_woman__.jpg"
+        "/assets/template/Man_vol1/Man_vol_1_018.jpg",
+        "/assets/template/Man_vol1/Man_vol_1_028.jpg",
+        "/assets/template/Man_vol1/Man_vol_1_043.jpg",
+        "/assets/template/Man_vol1/Man_vol_1_045.jpg",
+        "/assets/template/Man_vol1/Man_vol_1_080.jpg",
+        "/assets/template/Man_vol1/Man_vol_1_096.jpg",
+        "/assets/template/Man_vol1/Man_vol_1_082.jpg",
+        "/assets/template/Man_vol1/Man_vol_1_086.jpg",
+        "/assets/template/Man_vol1/Man_vol_1_076.jpg"
       ],
       "isFree": false,
-      "stripeProductId": "prod_TXAwhmWT1JfnTa",
-      "stripePriceId": "price_1Sa6aYECl1bhpZb4eqEv4E03"
+      "stripeProductId": "prod_TaiNyZN0nuFHPA",
+      "stripePriceId": "price_1SdWwjCsP6fjj8qpHnAmUUVw"
     },
 
-          {
-        "id": "pack-face-Woman-vol2",
-        "name": {
-          "ja": "女性の顔 ボリューム2",
-          "en": "Women's faces vol.2"
-        },
-        "description": {
-          "ja": "女性の顔 幅広い年齢層 様々な角度",
-          "en": "Women's faces Wide range of ages Various angles"
-        },
-        "category": "portrait",
-        "price": 300,
-        "photoCount": 100,
-        "thumbnailUrl": "/assets/template/pack-face-Woman-vol2/pose_6_Vulnerable_close_up__a_woman_s.jpg",
-        "previewImages": [
-          "/assets/template/pack-face-Woman-vol2/gesture-genius-1764741931018.jpg",
-          "/assets/template/pack-face-Woman-vol2/gesture-genius-1764741947335.jpg",
-          "/assets/template/pack-face-Woman-vol2/gesture-genius-1764776024943.jpg",
-          "/assets/template/pack-face-Woman-vol2/gesture-genius-1764776492730.jpg",
-          "/assets/template/pack-face-Woman-vol2/gesture-genius-1764836825714.jpg",
-          "/assets/template/pack-face-Woman-vol2/gesture-genius-1764837544365.jpg",
-          "/assets/template/pack-face-Woman-vol2/gesture-genius-1764838412015.jpg",
-          "/assets/template/pack-face-Woman-vol2/pose_3_A_powerful_close_up_of_a_woman.jpg",
-          "/assets/template/pack-face-Woman-vol2/pose_6_Vulnerable_close_up__a_woman_s.jpg"
-        ],
-        "isFree": false,
-        "stripeProductId": "prod_TXAwhmWT1JfnTa",
-        "stripePriceId": "price_1Sa6aYECl1bhpZb4eqEv4E03"
-      }
+        {
+      "id": "Man_vol2",
+      "name": {
+        "ja": "男性　ボリューム２",
+        "en": "Man vol.2"
+      },
+      "description": {
+        "ja": "100枚の男性の顔。様々な顔の向き・表情・年齢層",
+        "en": "100 male faces. Various orientations, expressions, and age groups."
+      },
+      "category": "portrait",
+      "price": 300,
+      "photoCount": 100,
+      "thumbnailUrl": "/assets/template/Man_vol2/Man_vol_2_086.jpg",
+      "previewImages": [
+        "/assets/template/Man_vol2/Man_vol_2_003.jpg",
+        "/assets/template/Man_vol2/Man_vol_2_006.jpg",
+        "/assets/template/Man_vol2/Man_vol_2_018.jpg",
+        "/assets/template/Man_vol2/Man_vol_2_050.jpg",
+        "/assets/template/Man_vol2/Man_vol_2_080.jpg",
+        "/assets/template/Man_vol2/Man_vol_2_081.jpg",
+        "/assets/template/Man_vol2/Man_vol_2_082.jpg",
+        "/assets/template/Man_vol2/Man_vol_2_055.jpg",
+        "/assets/template/Man_vol2/Man_vol_2_075.jpg"
+      ],
+      "isFree": false,
+      "stripeProductId": "prod_TaigehdpcQKK8D",
+      "stripePriceId": "price_1SdXEjCsP6fjj8qpcPbpTn14"
+    },
+
+    {
+      "id": "Woman_vol1",
+      "name": {
+        "ja": "女性　ボリューム１",
+        "en": "Woman vol.1"
+      },
+      "description": {
+        "ja": "100枚の女性の顔。様々な顔の向き・表情・年齢層",
+        "en": "100 women's faces. Various orientations, expressions, and age groups."
+      },
+      "category": "portrait",
+      "price": 300,
+      "photoCount": 100,
+      "thumbnailUrl": "/assets/template/Woman_vol1/Woman_vol_1_092.jpg",
+      "previewImages": [
+        "/assets/template/Woman_vol1/Woman_vol_1_059.jpg",
+        "/assets/template/Woman_vol1/Woman_vol_1_097.jpg",
+        "/assets/template/Woman_vol1/Woman_vol_1_040.jpg",
+        "/assets/template/Woman_vol1/Woman_vol_1_044.jpg",
+        "/assets/template/Woman_vol1/Woman_vol_1_088.jpg",
+        "/assets/template/Woman_vol1/Woman_vol_1_015.jpg",
+        "/assets/template/Woman_vol1/Woman_vol_1_050.jpg",
+        "/assets/template/Woman_vol1/Woman_vol_1_047.jpg",
+        "/assets/template/Woman_vol1/Woman_vol_1_087.jpg"
+      ],
+      "isFree": false,
+      "stripeProductId": "prod_TaiqrEvexgS4lF",
+      "stripePriceId": "price_1SdXOiCsP6fjj8qpkOV3Whua"
+    },
+
+    {
+      "id": "Woman_vol2",
+      "name": {
+        "ja": "女性　ボリューム２",
+        "en": "Woman vol.2"
+      },
+      "description": {
+        "ja": "100枚の女性の顔。様々な顔の向き・表情・年齢層",
+        "en": "100 women's faces. Various orientations, expressions, and age groups."
+      },
+      "category": "portrait",
+      "price": 300,
+      "photoCount": 100,
+      "thumbnailUrl": "/assets/template/Woman_vol2/Woman_vol_2_076.jpg",
+      "previewImages": [
+        "/assets/template/Woman_vol2/Woman_vol_2_001.jpg",
+        "/assets/template/Woman_vol2/Woman_vol_2_002.jpg",
+        "/assets/template/Woman_vol2/Woman_vol_2_018.jpg",
+        "/assets/template/Woman_vol2/Woman_vol_2_022.jpg",
+        "/assets/template/Woman_vol2/Woman_vol_2_085.jpg",
+        "/assets/template/Woman_vol2/Woman_vol_2_065.jpg",
+        "/assets/template/Woman_vol2/Woman_vol_2_075.jpg",
+        "/assets/template/Woman_vol2/Woman_vol_2_093.jpg",
+        "/assets/template/Woman_vol2/Woman_vol_2_038.jpg"
+      ],
+      "isFree": false,
+      "stripeProductId": "prod_TaiyWTLPqEJ4Lq",
+      "stripePriceId": "price_1SdXWICsP6fjj8qpQkqnWTIL"
+    },
+
+    {
+      "id": "Mixed_Face_Pack_vol1",
+      "name": {
+        "ja": "顔のバラエティパック　ボリューム１",
+        "en": "Mixed Face Pack vol.1"
+      },
+      "description": {
+        "ja": "50枚の男性＆女性の顔。様々な顔の向き・表情・年齢層",
+        "en": "50 male and female faces. Various orientations, expressions, and age groups."
+      },
+      "category": "portrait",
+      "price": 200,
+      "photoCount": 50,
+      "thumbnailUrl": "/assets/template/Mixed_Face_Pack_vol1/Mixface_vol_1_001.jpg",
+      "previewImages": [
+        "/assets/template/Mixed_Face_Pack_vol1/Mixface_vol_1_002.jpg",
+        "/assets/template/Mixed_Face_Pack_vol1/Mixface_vol_1_020.jpg",
+        "/assets/template/Mixed_Face_Pack_vol1/Mixface_vol_1_026.jpg",
+        "/assets/template/Mixed_Face_Pack_vol1/Mixface_vol_1_027.jpg",
+        "/assets/template/Mixed_Face_Pack_vol1/Mixface_vol_1_044.jpg",
+        "/assets/template/Mixed_Face_Pack_vol1/Mixface_vol_1_049.jpg",
+        "/assets/template/Mixed_Face_Pack_vol1/Mixface_vol_1_045.jpg",
+        "/assets/template/Mixed_Face_Pack_vol1/Mixface_vol_1_008.jpg",
+        "/assets/template/Mixed_Face_Pack_vol1/Mixface_vol_1_005.jpg"
+      ],
+      "isFree": false,
+      "stripeProductId": "prod_TajDIrp6wwXZ3m",
+      "stripePriceId": "price_1SdXktCsP6fjj8qp4ORnS6Xi"
+    },
+
+    {
+      "id": "Mixed_Face_Pack_vol2",
+      "name": {
+        "ja": "顔のバラエティパック　ボリューム２",
+        "en": "Mixed Face Pack vol.2"
+      },
+      "description": {
+        "ja": "50枚の男性＆女性の顔。様々な顔の向き・表情・年齢層",
+        "en": "50 male and female faces. Various orientations, expressions, and age groups."
+      },
+      "category": "portrait",
+      "price": 200,
+      "photoCount": 50,
+      "thumbnailUrl": "/assets/template/Mixed_Face_Pack_vol2/Mixface_vol_2_001.jpg",
+      "previewImages": [
+        "/assets/template/Mixed_Face_Pack_vol2/Mixface_vol_2_029.jpg",
+        "/assets/template/Mixed_Face_Pack_vol2/Mixface_vol_2_030.jpg",
+        "/assets/template/Mixed_Face_Pack_vol2/Mixface_vol_2_041.jpg",
+        "/assets/template/Mixed_Face_Pack_vol2/Mixface_vol_2_036.jpg",
+        "/assets/template/Mixed_Face_Pack_vol2/Mixface_vol_2_004.jpg",
+        "/assets/template/Mixed_Face_Pack_vol2/Mixface_vol_2_005.jpg",
+        "/assets/template/Mixed_Face_Pack_vol2/Mixface_vol_2_024.jpg",
+        "/assets/template/Mixed_Face_Pack_vol2/Mixface_vol_2_031.jpg",
+        "/assets/template/Mixed_Face_Pack_vol2/Mixface_vol_2_011.jpg"
+      ],
+      "isFree": false,
+      "stripeProductId": "prod_TajLcbxxN2iiOt",
+      "stripePriceId": "price_1SdXt5CsP6fjj8qpPuNmOmj8"
+    }
+
+    
 
 
   ]

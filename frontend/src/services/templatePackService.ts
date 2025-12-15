@@ -31,10 +31,10 @@ export const getTemplatePackById = async (packId: string): Promise<TemplatePackM
 
 /**
  * Download free template pack
- * For free packs, this generates a download JSON file
- * For paid packs (Phase 2), this will call the backend API
+ * Fetches pre-built JSON from /data/packs/ and imports directly
  */
 export const downloadFreePack = async (packId: string): Promise<void> => {
+  // 1. Validate pack metadata
   const pack = await getTemplatePackById(packId);
 
   if (!pack) {
@@ -45,32 +45,19 @@ export const downloadFreePack = async (packId: string): Promise<void> => {
     throw new Error(`Pack ${packId} is not free. Use purchase flow instead.`);
   }
 
-  // TODO Phase 3: Replace with actual backend API call to get photo data
-  // For now, create a placeholder download structure
-  const packData: TemplatePackDownload = {
-    version: '1.0',
-    exportDate: new Date().toISOString(),
-    packId: pack.id,
-    packName: pack.name.ja,
-    folderName: `📦 ${pack.name.ja}`,
-    totalPhotos: pack.photoCount,
-    photos: [] // Will be populated by backend in Phase 3
-  };
+  // 2. Fetch pre-built JSON
+  const response = await fetch(`/data/packs/${packId}.json`);
+  if (!response.ok) {
+    throw new Error(`Failed to load pack data: ${response.statusText}`);
+  }
 
-  // Create download link
-  const dataStr = JSON.stringify(packData, null, 2);
-  const blob = new Blob([dataStr], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
+  // 3. Parse JSON
+  const downloadData: TemplatePackDownload = await response.json();
 
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `${pack.id}.json`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  // 4. Auto-import using existing function
+  await importTemplatePack(downloadData);
 
-  console.log('[TemplatePackService] Downloaded free pack:', packId);
+  console.log('[TemplatePackService] Free pack imported successfully:', packId);
 };
 
 /**
