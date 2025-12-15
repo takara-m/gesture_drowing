@@ -1,7 +1,8 @@
 import { db } from './db';
-import type { Photo } from './db';
+import type { Photo, Folder } from './db';
 import { v4 as uuidv4 } from 'uuid';
 import { z } from 'zod';
+import { getAllFolders, createFolder } from './folderService';
 
 // ===== セキュリティ制限 =====
 const MAX_PHOTOS = 100; // 最大保存可能写真数
@@ -28,10 +29,17 @@ const PhotoSchema = z.object({
   tags: z.array(z.string()).optional()
 });
 
+const FolderSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().min(1).max(255),
+  createdAt: z.union([z.date(), z.string().datetime()])
+});
+
 const BackupSchema = z.object({
   version: z.string(),
   exportDate: z.string().datetime(),
   totalPhotos: z.number().int().nonnegative(),
+  folders: z.array(FolderSchema).optional(),  // v2.0用（v1.0互換性のためoptional）
   photos: z.array(PhotoSchema).max(MAX_PHOTOS)
 });
 
@@ -314,6 +322,7 @@ export interface PhotoBackup {
   version: string;
   exportDate: string;
   totalPhotos: number;
+  folders?: Folder[];  // v2.0: フォルダ情報（v1.0互換性のためoptional）
   photos: Photo[];
 }
 
@@ -322,16 +331,18 @@ export const exportPhotosToJSON = async (): Promise<string> => {
   try {
     console.log('[exportPhotosToJSON] Starting export...');
     const photos = await getAllPhotos();
+    const folders = await getAllFolders();
 
     const backup: PhotoBackup = {
-      version: '1.0',
+      version: '2.0',
       exportDate: new Date().toISOString(),
       totalPhotos: photos.length,
+      folders: folders,
       photos: photos
     };
 
     const jsonString = JSON.stringify(backup, null, 2);
-    console.log(`[exportPhotosToJSON] Successfully exported ${photos.length} photos, JSON size: ${jsonString.length} bytes`);
+    console.log(`[exportPhotosToJSON] Successfully exported ${photos.length} photos and ${folders.length} folders, JSON size: ${jsonString.length} bytes`);
 
     return jsonString;
   } catch (error) {
@@ -373,6 +384,31 @@ export const importPhotosFromJSON = async (jsonString: string): Promise<{ import
     const backup: PhotoBackup = validationResult.data as PhotoBackup;
     console.log(`[importPhotosFromJSON] Backup version: ${backup.version}, Total photos in backup: ${backup.totalPhotos}`);
 
+    // フォルダIDマッピング（旧ID → 新ID）
+    const folderIdMap = new Map<string, string>();
+
+    // v2.0の場合: フォルダを復元
+    if (backup.version === '2.0' && backup.folders && backup.folders.length > 0) {
+      console.log(`[importPhotosFromJSON] Restoring ${backup.folders.length} folders...`);
+      const existingFolders = await getAllFolders();
+
+      for (const backupFolder of backup.folders) {
+        // フォルダ名でマッチング
+        const existingFolder = existingFolders.find(f => f.name === backupFolder.name);
+
+        if (existingFolder) {
+          // 既存フォルダを使用
+          folderIdMap.set(backupFolder.id, existingFolder.id);
+          console.log(`[importPhotosFromJSON] Using existing folder: "${backupFolder.name}" (${backupFolder.id} → ${existingFolder.id})`);
+        } else {
+          // 新規作成
+          const newFolder = await createFolder(backupFolder.name);
+          folderIdMap.set(backupFolder.id, newFolder.id);
+          console.log(`[importPhotosFromJSON] Created new folder: "${backupFolder.name}" (${backupFolder.id} → ${newFolder.id})`);
+        }
+      }
+    }
+
     // 既存の写真IDを取得
     const existingPhotos = await getAllPhotos();
     const existingIds = new Set(existingPhotos.map(p => p.id));
@@ -407,9 +443,17 @@ export const importPhotosFromJSON = async (jsonString: string): Promise<{ import
           continue;
         }
 
+        // folderIdを変換（マッピングがあれば）
+        let finalFolderId = photo.folderId;
+        if (photo.folderId && folderIdMap.has(photo.folderId)) {
+          finalFolderId = folderIdMap.get(photo.folderId)!;
+          console.log(`[importPhotosFromJSON] Mapped folderId: ${photo.folderId} → ${finalFolderId} for photo ${photo.filename}`);
+        }
+
         // 写真を追加（addedAtをDateオブジェクトに変換）
         await db.photos.add({
           ...photo,
+          folderId: finalFolderId,
           addedAt: new Date(photo.addedAt)
         });
 
