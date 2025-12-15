@@ -433,8 +433,8 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
       <div className="max-w-7xl mx-auto">
         <div className="glass-card rounded-lg p-8">
           {/* ヘッダー */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-3">
               {onBackToPhotos && (
                 <button
                   onClick={onBackToPhotos}
@@ -453,7 +453,7 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
           </div>
 
           {/* ステップ選択 */}
-          <div className="mb-4 flex items-center gap-2">
+          <div className="mb-3 flex items-center gap-2">
             {[1, 2].map(step => (
               <button
                 key={step}
@@ -478,7 +478,7 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
           </div>
 
           {/* 写真切替ボタン */}
-          <div className="mb-6">
+          <div className="mb-4">
             <button
               onClick={changePhoto}
               className="flex items-center gap-2 px-6 py-3 bg-white/5 backdrop-blur-sm text-white rounded-2xl border border-white/10 shadow-sm hover:shadow-md transition-all duration-200"
