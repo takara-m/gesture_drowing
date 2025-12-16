@@ -318,7 +318,7 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
             <div className="w-full max-w-xs">
               <PhotoUsageMeter
                 currentCount={folderPhotoCounts.get(null) || 0}
-                maxCount={500}
+                maxCount={1000}
                 compact={true}
               />
             </div>
@@ -449,7 +449,7 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
             <div className="w-full mb-6">
               <PhotoUsageMeter
                 currentCount={folderPhotoCounts.get(null) || 0}
-                maxCount={500}
+                maxCount={1000}
               />
             </div>
 

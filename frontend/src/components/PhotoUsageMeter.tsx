@@ -18,9 +18,9 @@ export const PhotoUsageMeter: React.FC<PhotoUsageMeterProps> = ({
   const remaining = maxCount - currentCount;
 
   // Color coding:
-  // Green/Procreate: 0-70% (0-350 photos)
-  // Yellow: 70-90% (350-450 photos)
-  // Red: 90-100% (450-500 photos)
+  // Green/Procreate: 0-70% (0-700 photos)
+  // Yellow: 70-90% (700-900 photos)
+  // Red: 90-100% (900-1000 photos)
   const getBarColor = () => {
     if (percentage >= 90) return 'bg-red-500';
     if (percentage >= 70) return 'bg-yellow-500';
