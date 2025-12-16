@@ -62,17 +62,52 @@ export const downloadFreePack = async (packId: string): Promise<void> => {
 
 /**
  * Download purchased pack from backend
- * Phase 2/3: This will make an authenticated API call to fetch the pack data
+ * Verifies purchase with server and imports the pack data
  */
-export const downloadPurchasedPack = async (packId: string, _sessionId: string): Promise<void> => {
-  // TODO Phase 3: Implement backend API call
-  // const response = await fetch(`/api/download-pack?packId=${packId}&sessionId=${_sessionId}`);
-  // if (!response.ok) throw new Error('Download failed');
-  // const packData = await response.json();
+export const downloadPurchasedPack = async (packId: string, sessionId: string): Promise<void> => {
+  console.log('[TemplatePackService] Downloading purchased pack:', packId);
 
-  // For now, same as free pack
-  console.warn('[TemplatePackService] downloadPurchasedPack not yet implemented. Falling back to free pack download.');
-  await downloadFreePack(packId);
+  // 1. Validate pack metadata
+  const pack = await getTemplatePackById(packId);
+
+  if (!pack) {
+    throw new Error(`Pack not found: ${packId}`);
+  }
+
+  if (pack.isFree) {
+    throw new Error(`Pack ${packId} is free. Use downloadFreePack instead.`);
+  }
+
+  // 2. Verify purchase with server
+  const verifyResponse = await fetch('/api/verify-purchase', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sessionId, packId })
+  });
+
+  if (!verifyResponse.ok) {
+    const error = await verifyResponse.json();
+    throw new Error(error.error || 'Purchase verification failed. Please contact support.');
+  }
+
+  const { verified } = await verifyResponse.json();
+  if (!verified) {
+    throw new Error('Purchase not verified');
+  }
+
+  // 3. Fetch pre-built JSON
+  const response = await fetch(`/data/packs/${packId}.json`);
+  if (!response.ok) {
+    throw new Error(`Failed to load pack data: ${response.statusText}`);
+  }
+
+  // 4. Parse JSON
+  const downloadData: TemplatePackDownload = await response.json();
+
+  // 5. Auto-import using existing function
+  await importTemplatePack(downloadData);
+
+  console.log('[TemplatePackService] Purchased pack imported successfully:', packId);
 };
 
 /**

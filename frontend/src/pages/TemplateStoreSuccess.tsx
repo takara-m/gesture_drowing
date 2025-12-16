@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCircle } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { markAsPurchased } from '../services/purchaseHistoryService';
-import { getTemplatePackById } from '../services/templatePackService';
+import { getTemplatePackById, downloadPurchasedPack } from '../services/templatePackService';
 import type { TemplatePackMetadata } from '../types/templatePack';
 
 export const TemplateStoreSuccess: React.FC = () => {
@@ -12,6 +12,7 @@ export const TemplateStoreSuccess: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [pack, setPack] = useState<TemplatePackMetadata | null>(null);
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState(false);
 
   const sessionId = searchParams.get('session_id');
   const packId = searchParams.get('pack_id');
@@ -44,6 +45,31 @@ export const TemplateStoreSuccess: React.FC = () => {
 
     processPurchase();
   }, [packId, navigate]);
+
+  const handleDownloadPack = async () => {
+    if (!pack || !sessionId) {
+      alert(t('templateStore.downloadError'));
+      return;
+    }
+
+    try {
+      setDownloading(true);
+      console.log('[TemplateStoreSuccess] Downloading pack:', pack.id);
+
+      await downloadPurchasedPack(pack.id, sessionId);
+
+      alert(t('templateStore.purchaseSuccess.downloadComplete', {
+        packName: pack.name[language]
+      }));
+
+      navigate('/');
+    } catch (error) {
+      console.error('[TemplateStoreSuccess] Download failed:', error);
+      alert(t('templateStore.downloadError'));
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -92,14 +118,18 @@ export const TemplateStoreSuccess: React.FC = () => {
         {/* Buttons */}
         <div className="space-y-3">
           <button
-            onClick={() => {
-              // TODO Phase 3: ダウンロード処理
-              console.log('[TemplateStoreSuccess] Download pack:', pack.id);
-              alert('ダウンロード機能はPhase 3で実装予定です');
-            }}
-            className="w-full bg-procreate-accent text-white font-semibold py-3 rounded-lg hover:bg-blue-600 transition-all shadow-lg"
+            onClick={handleDownloadPack}
+            disabled={downloading}
+            className="w-full bg-procreate-accent text-white font-semibold py-3 rounded-lg hover:bg-blue-600 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {t('templateStore.purchaseSuccess.downloadButton')}
+            {downloading ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
+                {t('templateStore.downloading')}
+              </span>
+            ) : (
+              t('templateStore.purchaseSuccess.downloadButton')
+            )}
           </button>
 
           <button

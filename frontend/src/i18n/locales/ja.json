@@ -105,7 +105,7 @@
   "drawingTool": {
     "title": "Gesdro!",
     "subtitle": "顔ジェスチャードローイング学習ツール",
-    "backToPhotos": "写真一覧に戻る",
+    "backToPhotos": "戻る",
     "currentStep": "Step {{step}}: {{description}}",
     "steps": {
       "1": "顔写真の上に描画（トレースモード）",
@@ -228,6 +228,8 @@
     "title": "テンプレート購入",
     "description": "プロ品質の写真パックで練習の幅を広げよう",
     "backToApp": "アプリに戻る",
+    "downloading": "ダウンロード中...",
+    "downloadError": "ダウンロードに失敗しました。もう一度お試しください。",
     "categories": {
       "all": "全て",
       "portrait": "顔",
@@ -257,7 +259,8 @@
       "downloadInstructions": "下のボタンからパックをダウンロードして、写真管理画面でインポートしてください",
       "downloadButton": "パックをダウンロード",
       "importButton": "写真管理画面を開く",
-      "backupReminder": "💡 ダウンロードしたJSONファイルは大切に保管してください。いつでも再インポート可能です。"
+      "backupReminder": "💡 ダウンロードしたJSONファイルは大切に保管してください。いつでも再インポート可能です。",
+      "downloadComplete": "「{{packName}}」のダウンロードが完了しました。写真管理画面で確認できます。"
     },
     "purchaseError": {
       "title": "購入エラー",
@@ -267,7 +270,6 @@
     "loading": "パックを読み込み中...",
     "loadError": "読み込みエラー",
     "loadErrorDescription": "パック情報の読み込みに失敗しました",
-    "freePackDownloaded": "{{packName}} をダウンロードして写真管理画面に追加しました！",
-    "downloadError": "ダウンロードに失敗しました。もう一度お試しください。"
+    "freePackDownloaded": "{{packName}} をダウンロードして写真管理画面に追加しました！"
   }
 }

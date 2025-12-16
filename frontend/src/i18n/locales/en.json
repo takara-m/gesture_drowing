@@ -105,7 +105,7 @@
   "drawingTool": {
     "title": "Gesdro!",
     "subtitle": "Face Gesture Drawing Learning Tool",
-    "backToPhotos": "Back to Photo List",
+    "backToPhotos": "Back",
     "currentStep": "Step {{step}}: {{description}}",
     "steps": {
       "1": "Trace over the photo (Tracing Mode)",
@@ -228,6 +228,8 @@
     "title": "Template Store",
     "description": "Expand your practice with professional quality photo packs",
     "backToApp": "Back to App",
+    "downloading": "Downloading...",
+    "downloadError": "Download failed. Please try again.",
     "categories": {
       "all": "All",
       "portrait": "Face",
@@ -257,7 +259,8 @@
       "downloadInstructions": "Download the pack using the button below, then import it in the photo management screen",
       "downloadButton": "Download Pack",
       "importButton": "Open Photo Manager",
-      "backupReminder": "💡 Keep the downloaded JSON file safe. You can re-import it anytime."
+      "backupReminder": "💡 Keep the downloaded JSON file safe. You can re-import it anytime.",
+      "downloadComplete": "\"{{packName}}\" has been downloaded successfully. Check the Photo Manager."
     },
     "purchaseError": {
       "title": "Purchase Error",
@@ -267,7 +270,6 @@
     "loading": "Loading packs...",
     "loadError": "Load Error",
     "loadErrorDescription": "Failed to load pack information",
-    "freePackDownloaded": "{{packName}} has been downloaded and added to your photo library!",
-    "downloadError": "Download failed. Please try again."
+    "freePackDownloaded": "{{packName}} has been downloaded and added to your photo library!"
   }
 }
