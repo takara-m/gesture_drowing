@@ -9,6 +9,14 @@
       "destination": "/api/:path*"
     },
     {
+      "source": "/data/:path*",
+      "destination": "/data/:path*"
+    },
+    {
+      "source": "/assets/:path*",
+      "destination": "/assets/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
