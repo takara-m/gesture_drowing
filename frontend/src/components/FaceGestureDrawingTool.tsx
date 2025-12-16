@@ -434,7 +434,7 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
         <div className="glass-card rounded-lg p-8">
           {/* ヘッダー */}
           <div className="mb-4">
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2 mb-3">
               {onBackToPhotos && (
                 <button
                   onClick={onBackToPhotos}
@@ -444,48 +444,45 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
                   {t('drawingTool.backToPhotos')}
                 </button>
               )}
+
+              {/* ステップ選択 */}
+              <div className="flex items-center gap-2">
+                {[1, 2].map(step => (
+                  <button
+                    key={step}
+                    onClick={() => setCurrentStep(step)}
+                    className={`px-6 py-3 rounded-2xl font-semibold transition-all duration-200 border border-white/10 ${
+                      currentStep === step
+                        ? 'bg-procreate-accent text-white shadow-lg'
+                        : 'bg-white/5 backdrop-blur-sm text-white shadow-sm hover:shadow-md'
+                    }`}
+                  >
+                    Step {step}
+                  </button>
+                ))}
+                {/* 写真切替ボタン */}
+                <button
+                  onClick={changePhoto}
+                  className="flex items-center gap-2 px-6 py-3 bg-white/5 backdrop-blur-sm text-white rounded-2xl border border-white/10 shadow-sm hover:shadow-md transition-all duration-200"
+                >
+                  <RefreshCw size={20} />
+                  {t('drawingTool.changePhoto')}
+                </button>
+              </div>
             </div>
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl px-4 py-3 shadow-sm">
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl px-4 py-3 shadow-sm flex items-center gap-2">
+              {/* Stepとは？リンク */}
+              <button
+                onClick={() => setShowStepHelpModal(true)}
+                className="flex items-center gap-1 text-xs text-procreate-accent hover:underline"
+              >
+                <HelpCircle size={14} />
+                Stepとは？
+              </button>
               <p className="text-white text-lg font-semibold">
                 Step {currentStep}: {t(`drawingTool.steps.${currentStep}`)}
               </p>
             </div>
-          </div>
-
-          {/* ステップ選択 */}
-          <div className="mb-3 flex items-center gap-2">
-            {[1, 2].map(step => (
-              <button
-                key={step}
-                onClick={() => setCurrentStep(step)}
-                className={`px-6 py-3 rounded-2xl font-semibold transition-all duration-200 border border-white/10 ${
-                  currentStep === step
-                    ? 'bg-procreate-accent text-white shadow-lg'
-                    : 'bg-white/5 backdrop-blur-sm text-white shadow-sm hover:shadow-md'
-                }`}
-              >
-                Step {step}
-              </button>
-            ))}
-            {/* Stepとは？リンク */}
-            <button
-              onClick={() => setShowStepHelpModal(true)}
-              className="flex items-center gap-1 text-xs text-procreate-accent hover:underline ml-2"
-            >
-              <HelpCircle size={14} />
-              Stepとは？
-            </button>
-          </div>
-
-          {/* 写真切替ボタン */}
-          <div className="mb-4">
-            <button
-              onClick={changePhoto}
-              className="flex items-center gap-2 px-6 py-3 bg-white/5 backdrop-blur-sm text-white rounded-2xl border border-white/10 shadow-sm hover:shadow-md transition-all duration-200"
-            >
-              <RefreshCw size={20} />
-              {t('drawingTool.changePhoto')}
-            </button>
           </div>
 
           {/* メインコンテンツ */}
@@ -691,6 +688,9 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
                   </div>
                 )}
               </div>
+
+              {/* スクロール可動域用の空白コンテナ */}
+              <div className="h-[100px]"></div>
             </div>
           </div>
         </div>
