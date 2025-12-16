@@ -51,6 +51,11 @@
       "restore": "Restore",
       "hint": "Click on a photo to use it in the drawing tool. You can upload multiple photos at once."
     },
+    "photoUsage": {
+      "title": "Photo Storage",
+      "current": "{{current}} / {{max}} photos",
+      "warning": "{{remaining}} remaining"
+    },
     "templateStore": {
       "callToAction": "If you find uploading photos tedious",
       "browseButton": "Browse Photo Packs"

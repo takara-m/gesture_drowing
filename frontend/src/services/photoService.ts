@@ -5,8 +5,8 @@ import { z } from 'zod';
 import { getAllFolders, createFolder } from './folderService';
 
 // ===== セキュリティ制限 =====
-const MAX_PHOTOS = 100; // 最大保存可能写真数
-const MAX_BACKUP_SIZE = 50 * 1024 * 1024; // 50MB（バックアップJSONファイルの最大サイズ）
+const MAX_PHOTOS = 500; // 最大保存可能写真数（複数テンプレートパック購入対応）
+const MAX_BACKUP_SIZE = 150 * 1024 * 1024; // 150MB（バックアップJSONファイルの最大サイズ、500枚対応）
 const MAX_DATA_URL_SIZE = 5 * 1024 * 1024; // 5MB（単一Data URLの最大サイズ）
 
 // ===== バックアップJSON検証スキーマ (Zod) =====

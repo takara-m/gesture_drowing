@@ -3,6 +3,7 @@ import { Plus, Download, Upload as UploadIcon, Play, Folder as FolderIcon, Trash
 import { useNavigate } from 'react-router-dom';
 import { PhotoUploader } from '../components/PhotoUploader';
 import { PhotoGrid } from '../components/PhotoGrid';
+import { PhotoUsageMeter } from '../components/PhotoUsageMeter';
 import { useLanguage } from '../contexts/LanguageContext';
 import type { Photo, Folder } from '../services/db';
 import { getPhotoByOrder, exportPhotosToJSON, importPhotosFromJSON } from '../services/photoService';
@@ -312,6 +313,15 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
                 ))}
               </select>
             </div>
+
+            {/* Photo usage meter */}
+            <div className="w-full max-w-xs">
+              <PhotoUsageMeter
+                currentCount={folderPhotoCounts.get(null) || 0}
+                maxCount={500}
+                compact={true}
+              />
+            </div>
           </div>
         </div>
 
@@ -433,6 +443,14 @@ export const PhotoManager: React.FC<PhotoManagerProps> = ({ onPhotoSelect }) => 
                   className="hidden"
                 />
               </div>
+            </div>
+
+            {/* Photo usage meter in management section */}
+            <div className="w-full mb-6">
+              <PhotoUsageMeter
+                currentCount={folderPhotoCounts.get(null) || 0}
+                maxCount={500}
+              />
             </div>
 
             {/* 説明 + Template Store CTA */}
