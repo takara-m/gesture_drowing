@@ -264,7 +264,7 @@
       "downloadInstructions": "下のボタンからパックをダウンロードして、写真管理画面でインポートしてください",
       "downloadButton": "パックをダウンロード",
       "importButton": "写真管理画面を開く",
-      "backupReminder": "💡 ダウンロードしたJSONファイルは大切に保管してください。いつでも再インポート可能です。",
+      "backupReminder": "💡 写真管理画面でバックアップを作成しておくことをお勧めします。データの復元が可能です。",
       "downloadComplete": "「{{packName}}」のダウンロードが完了しました。写真管理画面で確認できます。"
     },
     "purchaseError": {

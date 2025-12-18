@@ -264,7 +264,7 @@
       "downloadInstructions": "Download the pack using the button below, then import it in the photo management screen",
       "downloadButton": "Download Pack",
       "importButton": "Open Photo Manager",
-      "backupReminder": "💡 Keep the downloaded JSON file safe. You can re-import it anytime.",
+      "backupReminder": "💡 We recommend creating a backup in the Photo Manager. You can restore your data anytime.",
       "downloadComplete": "\"{{packName}}\" has been downloaded successfully. Check the Photo Manager."
     },
     "purchaseError": {
