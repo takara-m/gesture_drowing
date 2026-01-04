@@ -235,7 +235,96 @@
       "stripePriceId": "price_1SdXt5CsP6fjj8qpPuNmOmj8"
     }
 
-    
+      {
+        "id": "Free-GesturePoses-SamplePack",
+        "name": {
+          "ja": "無料のジェスチャーポーズ集",
+          "en": "Free Gesture Poses SamplePack"
+        },
+        "description": {
+          "ja": "無料のジェスチャーポーズ集30枚。",
+          "en": "30 Free Gesture Pose Templates."
+        },
+        "category": "pose",
+        "price": 0,
+        "photoCount": 30,
+        "thumbnailUrl": "/assets/template/Free-GesturePoses-SamplePack/move_free_001.jpg",
+        "previewImages": [
+          "/assets/template/Free-GesturePoses-SamplePack/move_free_005.jpg",
+          "/assets/template/Free-GesturePoses-SamplePack/move_free_002.jpg",
+          "/assets/template/Free-GesturePoses-SamplePack/move_free_008.jpg",
+          "/assets/template/Free-GesturePoses-SamplePack/move_free_017.jpg",
+          "/assets/template/Free-GesturePoses-SamplePack/move_free_028.jpg",
+          "/assets/template/Free-GesturePoses-SamplePack/move_free_022.jpg",
+          "/assets/template/Free-GesturePoses-SamplePack/move_free_024.jpg",
+          "/assets/template/Free-GesturePoses-SamplePack/move_free_010.jpg",
+          "/assets/template/Free-GesturePoses-SamplePack/move_free_003.jpg"
+        ],
+        "isFree": true,
+        "stripeProductId": "",
+        "stripePriceId": ""
+      }
+
+      {
+          "id": "Male-GesturePoses-Pack",
+        "name": {
+          "ja": "男性のジェスチャーポーズ集",
+          "en": "Male Gesture Poses Pack"
+        },
+        "description": {
+          "ja": "男性の様々なポーズ集。108枚",
+          "en": "A collection of various poses for men. 108 images."
+        },
+        "category": "pose",
+        "price": 200,
+        "photoCount": 108,
+        "thumbnailUrl": "/assets/template/Male-GesturePoses-Pack/men_move_058.jpg",
+        "previewImages": [
+          "/assets/template/Male-GesturePoses-Pack/men_move_011.jpg",
+          "/assets/template/Male-GesturePoses-Pack/men_move_032.jpg",
+          "/assets/template/Male-GesturePoses-Pack/men_move_083.jpg",
+          "/assets/template/Male-GesturePoses-Pack/men_move_106.jpg",
+          "/assets/template/Male-GesturePoses-Pack/men_move_073.jpg",
+          "/assets/template/Male-GesturePoses-Pack/men_move_044.jpg",
+          "/assets/template/Male-GesturePoses-Pack/men_move_048.jpg",
+          "/assets/template/Male-GesturePoses-Pack/men_move_001.jpg",
+          "/assets/template/Male-GesturePoses-Pack/men_move_095.jpg"
+        ],
+        "isFree": false,
+        "stripeProductId": "prod_TjEaZz6zSxwPla",
+      "stripePriceId": "price_1Slm7ECsP6fjj8qpmnp8axUv"
+    }
+
+    {
+    "id": "Female-GesturePoses-Pack",
+    "name": {
+      "ja": "女性のジェスチャーポーズ集",
+      "en": "Female Gesture Poses Pack"
+    },
+    "description": {
+      "ja": "女性の様々なポーズ集。132枚",
+      "en": "A collection of various female poses. 132 images."
+    },
+    "category": "pose",
+    "price": 200,
+    "photoCount": 132,
+    "thumbnailUrl": "/assets/template/Female-GesturePoses-Pack/woman_move_077.jpg",
+    "previewImages": [
+      "/assets/template/Female-GesturePoses-Pack/woman_move_054.jpg",
+      "/assets/template/Female-GesturePoses-Pack/woman_move_049.jpg",
+      "/assets/template/Female-GesturePoses-Pack/woman_move_031.jpg",
+      "/assets/template/Female-GesturePoses-Pack/woman_move_016.jpg",
+      "/assets/template/Female-GesturePoses-Pack/woman_move_058.jpg",
+      "/assets/template/Female-GesturePoses-Pack/woman_move_071.jpg",
+      "/assets/template/Female-GesturePoses-Pack/woman_move_087.jpg",
+      "/assets/template/Female-GesturePoses-Pack/woman_move_100.jpg",
+      "/assets/template/Female-GesturePoses-Pack/woman_move_121.jpg"
+    ],
+    "isFree": false,
+    "stripeProductId": "prod_TjEdjiqhtcrwng",
+    "stripePriceId": "price_1SlmACCsP6fjj8qpFkNSgaqG"
+  }
+
 
 
   ]
