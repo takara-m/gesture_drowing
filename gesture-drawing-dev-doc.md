@@ -753,3 +753,94 @@ railway up
 4. 基本的なCanvas描画機能のプロトタイプ作成
 
 Claude Codeで「このドキュメントに基づいてプロジェクトを初期化してください」と指示すれば、段階的に実装できます！
+
+---
+
+## 📝 実装済み機能ログ
+
+### 2026-06-12 セキュリティアップデート & 描画設定の永続化
+
+#### 🔐 セキュリティ脆弱性対応
+**実施日**: 2026-06-12
+
+**内容**:
+- `npm audit fix` で 13個の脆弱性を完全解決
+- **主要アップデート**:
+  - react-router-dom: 7.9.6 → 7.17.0 (XSS/RCE/CSRF 修正)
+  - vite: 7.1.7 → 7.3.5 (Path Traversal/任意ファイル読み取り 修正)
+  - postcss: 8.5.6 → 8.5.15 (XSS 修正)
+  - uuid: 13.0.0 → 13.0.2 (Buffer 境界チェック 修正)
+  - 他 9つの脆弱性を自動修正
+
+**結果**: 脆弱性 0個、ビルド成功 ✅
+
+**コミット**: `36d0b1c` - fix: Update npm dependencies to resolve security vulnerabilities
+
+---
+
+#### 🌍 ブラウザ互換性データ更新
+
+**実施日**: 2026-06-12
+
+**内容**:
+- baseline-browser-mapping を最新版へ更新
+- caniuse-lite を最新版へ更新（7ヶ月古いデータを解消）
+- browserslist DB を最新化
+
+**結果**: ビルド警告が解消 ✅
+
+**コミット**: `6140481` - chore: Update browser compatibility data
+
+---
+
+#### 💾 Drawing 画面の設定を localStorage に永続保存
+
+**実施日**: 2026-06-12
+
+**実装内容**:
+
+##### 新規ファイル
+- `frontend/src/hooks/useDrawingSettings.ts`
+  - localStorage ベースの設定管理カスタム hook
+  - 自動保存・復元機能
+
+##### 修正ファイル
+- `frontend/src/components/FaceGestureDrawingTool.tsx`
+  - useDrawingSettings hook を導入
+  - useState → useDrawingSettings に置き換え
+
+##### 保存される設定値
+```typescript
+{
+  brushSize: number;          // ペンサイズ
+  brushColor: string;         // ペン色
+  showGrid: boolean;          // グリッド表示/非表示
+  gridSize: number;           // グリッドサイズ
+  gridOpacity: number;        // グリッド濃さ
+  currentStep: 1 | 2;         // 現在のステップ
+}
+```
+
+##### 動作確認
+- ✅ ページ更新（F5）→ 設定を復元
+- ✅ ページ切替（GesdroApp ↔ PhotoManager など）→ 設定を復元
+- ✅ Step 1 ↔ Step 2 切り替え →設定を保持
+- ✅ 永続保存 → 次回訪問時も反映
+- ✅ TypeScript コンパイル成功
+- ✅ Vite ビルド成功
+
+**コミット**: `e5cf3ce` - feat: Add persistent drawing settings storage
+
+---
+
+### 📊 セッションサマリー
+
+| 項目 | 対応前 | 対応後 |
+|------|--------|--------|
+| **セキュリティ脆弱性** | 13個 | 0個 ✅ |
+| **npm パッケージ** | 古い | 最新 ✅ |
+| **ブラウザ互換性データ** | 7ヶ月古い | 最新 ✅ |
+| **描画設定の保持** | なし | localStorage で永続保存 ✅ |
+| **ビルド状態** | 成功 | 成功 ✅ |
+
+---
