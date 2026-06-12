@@ -6,6 +6,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { AnimatedLogo } from './AnimatedLogo';
 import { AdBanner } from './ads';
 import { useAdSenseContext } from '../contexts/AdSenseContext';
+import { useDrawingSettings } from '../hooks/useDrawingSettings';
 
 interface FaceGestureDrawingToolProps {
   selectedPhoto?: Photo | null;
@@ -17,19 +18,31 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
   const { t } = useLanguage();
   // TODO: Re-enable when needed - triggerInterstitialは広告再有効化時に使用
   const { /* triggerInterstitial */ } = useAdSenseContext();
-  const [currentStep, setCurrentStep] = useState(1);
+
+  // localStorage から設定を復元
+  const {
+    brushSize,
+    setBrushSize,
+    brushColor,
+    setBrushColor,
+    showGrid,
+    setShowGrid,
+    gridSize,
+    setGridSize,
+    gridOpacity,
+    setGridOpacity,
+    currentStep,
+    setCurrentStep,
+    isLoaded: _isLoaded, // 設定復元の完了を保証（使用しないため_prefix）
+  } = useDrawingSettings();
+
   const [currentPhoto, setCurrentPhoto] = useState<Photo | null>(selectedPhoto || null);
   const [photoUrl, setPhotoUrl] = useState<string>('');
-  const [brushSize, setBrushSize] = useState(3);
-  const [brushColor, setBrushColor] = useState('#000000');
   const [photoChangeCount, setPhotoChangeCount] = useState(0); // 写真切り替え回数カウンター
   const [isEraser, setIsEraser] = useState(false);
   const [drawingMode, setDrawingMode] = useState<'pen' | 'line' | 'ellipse'>('pen');
   const [showOverlay, setShowOverlay] = useState(false);
-  const [showGrid, setShowGrid] = useState(false);
-  const [gridSize, setGridSize] = useState(3);
   const [showStepHelpModal, setShowStepHelpModal] = useState(false); // Stepヘルプモーダル
-  const [gridOpacity, setGridOpacity] = useState(0.3);
   const [overlayOpacity, setOverlayOpacity] = useState(0.3);
   const [imageDimensions, setImageDimensions] = useState({ width: 400, height: 500 });
   const [isDrawerOpen, setIsDrawerOpen] = useState(true); // ドロワー開閉状態
@@ -447,7 +460,7 @@ const FaceGestureDrawingTool: React.FC<FaceGestureDrawingToolProps> = ({ selecte
 
               {/* ステップ選択 */}
               <div className="flex items-center gap-2">
-                {[1, 2].map(step => (
+                {([1, 2] as const).map(step => (
                   <button
                     key={step}
                     onClick={() => setCurrentStep(step)}
